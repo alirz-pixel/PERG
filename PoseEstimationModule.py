@@ -1,5 +1,6 @@
 import mediapipe as mp
 import numpy as np
+import math
 import cv2
 
 def calculate_angle(a, b, c):
@@ -24,7 +25,7 @@ mp_drawing = mp.solutions.drawing_utils
 mp_drawing.DrawingSpec(color=(0, 0, 255), thickness=2, circle_radius=2)
 
 # opencv의 frame을 넘겨받아야 함.
-def pose_estimation(frame, holistic, dict_PoseAngle, white_img):
+def pose_estimation(frame, holistic, dict_PoseAngle, dict_PoseLength, white_img):
     image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     results = holistic.process(image)
 
@@ -215,6 +216,187 @@ def pose_estimation(frame, holistic, dict_PoseAngle, white_img):
         dict_PoseAngle['LeftKnee'] = -1
 
 
+
+
+    # 16번과 14번 사이 거리 구하기
+    try:
+        RightWrist = [landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].x,
+                      landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].y]
+        RightElbow = [landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].x,
+                      landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].y]
+
+
+        length = math.hypot(RightElbow[0] - RightWrist[0], RightElbow[1] - RightWrist[1]) * 100
+        cv2.putText(image, str(length),
+                    tuple(np.multiply(RightWrist, [640, 480]).astype(int)),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA
+                    )
+
+        dict_PoseLength['16, 14'] = length
+
+    except:
+        dict_PoseLength['16, 14'] = -1
+
+
+    # 14번과 12번 사이 거리 구하기
+    try:
+        RightElbow = [landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].x,
+                      landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].y]
+        RightShoulder = [landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x,
+                         landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].y]
+
+
+        length = math.hypot(RightShoulder[0] - RightElbow[0], RightShoulder[1] - RightElbow[1]) * 100
+        cv2.putText(image, str(length),
+                    tuple(np.multiply(RightElbow, [640, 500]).astype(int)),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA
+                    )
+
+        dict_PoseLength['14, 12'] = length
+
+    except:
+        dict_PoseLength['14, 12'] = -1
+
+
+    # 24번과 12번 사이 거리 구하기
+    try:
+        RightShoulder = [landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x,
+                         landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].y]
+        RightHip = [landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].x,
+                    landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].y]
+
+
+        length = math.hypot(RightHip[0] - RightShoulder[0], RightHip[1] - RightShoulder[1]) * 100
+        cv2.putText(image, str(length),
+                    tuple(np.multiply(RightShoulder, [640, 500]).astype(int)),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA
+                    )
+
+        dict_PoseLength['24, 12'] = length
+
+    except:
+        dict_PoseLength['24, 12'] = -1
+
+
+    # 26번과 24번 사이 거리 구하기
+    try:
+        RightHip = [landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].x,
+                    landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].y]
+        RightKnee = [landmarks[mp_pose.PoseLandmark.RIGHT_KNEE.value].x,
+                     landmarks[mp_pose.PoseLandmark.RIGHT_KNEE.value].y]
+
+
+        length = math.hypot(RightKnee[0] - RightHip[0], RightKnee[1] - RightHip[1]) * 100
+        cv2.putText(image, str(length),
+                    tuple(np.multiply(RightHip, [640, 500]).astype(int)),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA
+                    )
+
+        dict_PoseLength['26, 24'] = length
+
+    except:
+        dict_PoseLength['26, 24'] = -1
+
+
+    # 28번과 26번 사이 거리 구하기
+    try:
+        RightKnee = [landmarks[mp_pose.PoseLandmark.RIGHT_KNEE.value].x,
+                     landmarks[mp_pose.PoseLandmark.RIGHT_KNEE.value].y]
+        RightAnkle = [landmarks[mp_pose.PoseLandmark.RIGHT_ANKLE.value].x,
+                      landmarks[mp_pose.PoseLandmark.RIGHT_ANKLE.value].y]
+
+
+        length = math.hypot(RightAnkle[0] - RightKnee[0], RightAnkle[1] - RightKnee[1]) * 100
+        cv2.putText(image, str(length),
+                    tuple(np.multiply(RightKnee, [640, 500]).astype(int)),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA
+                    )
+
+        dict_PoseLength['28, 26'] = length
+
+    except:
+        dict_PoseLength['28, 26'] = -1
+
+
+
+    # 15번과 13번 사이 거리 구하기
+    try:
+        LeftWrist = [landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].x,
+                     landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y]
+        LeftElbow = [landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x,
+                      landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].y]
+
+
+        length = math.hypot(LeftElbow[0] - LeftWrist[0], LeftElbow[1] - LeftWrist[1]) * 100
+        cv2.putText(image, str(length),
+                    tuple(np.multiply(LeftWrist, [640, 500]).astype(int)),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA
+                    )
+
+        dict_PoseLength['15, 13'] = length
+
+    except:
+        dict_PoseLength['15, 13'] = -1
+
+
+    # 13번과 11번 사이 거리 구하기
+    try:
+        LeftElbow = [landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x,
+                      landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].y]
+        LeftShoulder = [landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x,
+                        landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].y]
+
+
+        length = math.hypot(LeftShoulder[0] - LeftElbow[0], LeftShoulder[1] - LeftElbow[1]) * 100
+        cv2.putText(image, str(length),
+                    tuple(np.multiply(LeftElbow, [640, 500]).astype(int)),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA
+                    )
+
+        dict_PoseLength['13, 11'] = length
+
+    except:
+        dict_PoseLength['13, 11'] = -1
+
+
+    # 23번과 11번 사이 거리 구하기
+    try:
+        LeftShoulder = [landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x,
+                        landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].y]
+        LeftHip = [landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].x,
+                   landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].y]
+
+
+        length = math.hypot(LeftHip[0] - LeftShoulder[0], LeftHip[1] - LeftShoulder[1]) * 100
+        cv2.putText(image, str(length),
+                    tuple(np.multiply(LeftShoulder, [640, 500]).astype(int)),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA
+                    )
+
+        dict_PoseLength['23, 11'] = length
+
+    except:
+        dict_PoseLength['23, 11'] = -1
+
+
+    # 25번과 23번 사이 거리 구하기
+    try:
+        LeftHip = [landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].x,
+                   landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].y]
+        LeftKnee = [landmarks[mp_pose.PoseLandmark.LEFT_KNEE.value].x,
+                    landmarks[mp_pose.PoseLandmark.LEFT_KNEE.value].y]
+
+
+        length = math.hypot(LeftKnee[0] - LeftHip[0], LeftKnee[1] - LeftHip[1]) * 100
+        cv2.putText(image, str(length),
+                    tuple(np.multiply(LeftHip, [640, 500]).astype(int)),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA
+                    )
+
+        dict_PoseLength['25, 23'] = length
+
+    except:
+        dict_PoseLength['25, 23'] = -1
 
 
 
