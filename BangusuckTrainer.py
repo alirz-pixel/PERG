@@ -17,37 +17,39 @@ import sys
 
 BLACK = (0, 0, 0)
 
-list_NodeColor = ['node/RedNode.png', 'node/YellowNode.png', 'node/BlueNode.png', 'node/PurpleNode.png']
+# 기본 초기화 (반드시 해야 하는 것들)
+pygame.init()
 
-def MakeNode(isLeft = True, ColorNum = 0):
-    NodeColor = list_NodeColor[ColorNum]
-    Node = pygame.image.load(NodeColor).convert_alpha()
-    
-        
-    Node = pygame.transform.scale(Node, (60, 180))
-    NodeRect = Node.get_rect()
-    NodeRect.top = 540
+######################################################################
+# 화면 크기 설정
+Screen_Width = 1280  # 가로 크기
+Screen_Height = 720  # 세로 크기
+Screen = pygame.display.set_mode((Screen_Width, Screen_Height))
 
-    NodeRect.right = 1280
+# 화면 타이틀 설정
+pygame.display.set_caption("방구석 트레이너")  # 게임 이름
+######################################################################
+
+
+list_Node = [pygame.image.load("Rhythm/Cheerleader1.png").convert_alpha()]
+for i in range(len(list_Node)):
+    list_Node[i] = pygame.transform.scale(list_Node[i], (245, 511))
+
+def MakeNode(isLeft, Index = 0):
+    NodeRect = list_Node[Index].get_rect()
+    NodeRect.top = 200
+
+    NodeRect.right = Screen_Width + list_Node[Index].get_width()
     if isLeft:
-        NodeRect.left = 0
+        NodeRect.left = 0 - list_Node[Index].get_width()
 
-    return Node, NodeRect
+    return [list_Node[Index], NodeRect, isLeft]
 
 
 # OpenCV 기본 초기화
 #cap = cv.VideoCapture(0)
 
-# 기본 초기화 (반드시 해야 하는 것들)
-pygame.init()
-######################################################################
-# 화면 크기 설정
-Screen_Width = 1280 # 가로 크기
-Screen_Height = 720 # 세로 크기
-Screen = pygame.display.set_mode((Screen_Width, Screen_Height))
-    
-# 화면 타이틀 설정
-pygame.display.set_caption("방구석 트레이너") # 게임 이름
+
 ######################################################################
 # FPS
 Clock = pygame.time.Clock()
@@ -94,8 +96,7 @@ Percentage_Font = pygame.font.Font("Rhythm/CookieRun Bold.ttf", 40)
 ######################################################################
 Minus_Score = 0
 Percentage = 100
-queue1 = []
-queue2 = []
+queue_Node = []
 
 
 PlayOn = 1
@@ -104,7 +105,7 @@ BeatHeart = 1
 OpacityLevel = 255
 Crashed = False
 ######################################################################
-while not Crashed: 
+while not Crashed:
     dt = Clock.tick(30)
     Elapsed_Time = (pygame.time.get_ticks() - Start_Ticks) / 1000
     for event in pygame.event.get(): # 어떤 이벤트가 발생하였는가?
@@ -112,16 +113,18 @@ while not Crashed:
             pygame.quit()
         if event.type == pygame.MOUSEBUTTONDOWN:
             print(pygame.mouse.get_pos())
+
+            # 왼쪽 노드 추가하기
+            if random.randrange(0, 2):
+                queue_Node.append(MakeNode(1))
+
+            # 오른쪽 노드 추가하기
+            else:
+                queue_Node.append(MakeNode(0))
+
         if event.type == pygame.KEYDOWN: # 키가 눌렸는지 확인
             if event.key == pygame.K_UP: # 위쪽 방향키
                 print(float(Elapsed_Time))
-                for temp, tempRect in queue1:
-                    if tempRect.left >= (1280 / 2) - 100 and tempRect.left <= (1280 / 2) + 100:
-                        ScratchLongBGM.play()
-                        queue1.pop(0)
-                        queue2.pop(0)
-                    else:
-                        Minus_Score += 1
 
 ######################################################################
                         
@@ -147,10 +150,16 @@ while not Crashed:
     Screen.blit(Background_Laft, (0, 112))
     Screen.blit(Background_Right, (870, 112))
 ######################################################################
-    for temp, tempRect in queue1:
-        if tempRect.left >= (1280 / 2) - 60 and tempRect.left <= (1280 / 2) + 60:
-            queue1.pop(0)
-            queue2.pop(0)
+    for temp, tempRect, isLeft in queue_Node:
+        # 왼쪽 노드라면
+        if isLeft:
+            if tempRect.left >= (1280 / 2) - (temp.get_rect().width / 2):
+                queue_Node.pop(0)
+
+        # 오른쪽 노드라면
+        else:
+            if tempRect.right <= (1280 / 2) + (temp.get_rect().width / 2):
+                queue_Node.pop(0)
             
     if not pygame.mixer.music.get_busy(): #like this!  
         if PlayOn == 1:                 
@@ -186,28 +195,32 @@ while not Crashed:
 
     pygame.draw.rect(Screen, (0, 0, 0), [12, 10, 1256, 25], 3) # 타이머바 틀
     pygame.draw.rect(Screen, (255, 255, 255), [15, 13, Elapsed_Time * 7.70, 19]) # 타이머바
-######################################################################    
-    # 노래에 따른 노드 타이밍 설정
-    ColorNum = random.randrange(0, 4)
-
+######################################################################
     # 화면에 노드 추가하기
     if (float(Elapsed_Time) >= 2.8 and float(Elapsed_Time) <= 3):
         if TurnOn == 0:
-            queue1.append(MakeNode(True, ColorNum))
-            queue2.append(MakeNode(False, ColorNum))
+            # 왼쪽 노드 추가하기
+            if random.randrange(0, 2):
+                queue_Node.append(MakeNode(1))
+
+            # 오른쪽 노드 추가하기
+            else:
+                queue_Node.append(MakeNode(0))
             ScratchShortBGM.play()
             TurnOn += 1
     
     # 노드를 중앙으로 움직이기
-    for i in range(0, len(queue1)):
-        queue1[i][1].left += 30
-        queue2[i][1].right -= 30
+    for i in range(len(queue_Node)):
+        # 만약 왼쪽 노드라면
+        if queue_Node[i][2] == 1:
+            queue_Node[i][1].left += 20
+
+        # 만약 오른쪽 노드라면
+        else:
+            queue_Node[i][1].right -= 20
     
     # 노드를 화면에 출력하기
-    for temp, tempRect in queue1:
-        Screen.blit(temp, tempRect)
-        
-    for temp, tempRect in queue2:
+    for temp, tempRect, _ in queue_Node:
         Screen.blit(temp, tempRect)
 
 ######################################################################
