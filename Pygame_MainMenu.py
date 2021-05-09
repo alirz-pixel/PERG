@@ -14,7 +14,7 @@ pygame.display.set_caption("방구석 트레이너")
 pygame.mouse.set_visible(False)
 
 # 타이틀 이미지 불러오기
-Menu_Morning = pygame.image.load("MenuScreen/morning.PNG")
+Menu_Morning = pygame.image.load("MenuScreen/mainmenu/morning.PNG")
 Menu_Morning = pygame.transform.scale(Menu_Morning, (Screen_Width, Screen_Height))
 
 # 버튼 위치 설정하기
@@ -24,8 +24,8 @@ Whole_Button = pygame.Rect(861, 512, 350, 166)
 BUTTON = [Upper_Button, Lower_Button, Whole_Button]
 
 # 마우스 커서 추가하기
-Cursor = [pygame.image.load("MenuScreen/Cursor.png"),
-          pygame.image.load("MenuScreen/Cursor_Click.png")]
+Cursor = [pygame.image.load("MenuScreen/cursor/Cursor.png"),
+          pygame.image.load("MenuScreen/cursor/Cursor_Click.png")]
 Cursor[0] = pygame.transform.scale(Cursor[0], (80, 91))
 Cursor[1] = pygame.transform.scale(Cursor[1], (80, 91))
 

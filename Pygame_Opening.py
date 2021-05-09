@@ -9,13 +9,13 @@ py_size = (1280, 720)
 py_clock = pygame.time.Clock()
 
 # 이미지 불러오기
-py_openingImage0 = pygame.image.load('opening/starting screen_1.PNG')
+py_openingImage0 = pygame.image.load('MenuScreen/opening/starting screen_1.PNG')
 py_openingImage0 = pygame.transform.scale(py_openingImage0, py_size)
 
-py_openingImage1 = pygame.image.load('opening/starting_screen_2.PNG')
+py_openingImage1 = pygame.image.load('MenuScreen/opening/starting_screen_2.PNG')
 py_openingImage1 = pygame.transform.scale(py_openingImage1, py_size)
 
-py_TitleImage = pygame.image.load('opening/logo.PNG')
+py_TitleImage = pygame.image.load('MenuScreen/opening/logo.PNG')
 py_TitleImage = pygame.transform.scale(py_TitleImage, py_size)
 
 def Func_Openning(Screen):
