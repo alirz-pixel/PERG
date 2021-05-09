@@ -22,19 +22,29 @@ Screen = pygame.display.set_mode((Screen_Width, Screen_Height))
 
 # 화면 타이틀 설정
 pygame.display.set_caption("방구석 트레이너")  # 게임 이름
-list_Node = [pygame.image.load("Rhythm/Cheerleader1.png").convert_alpha()]
-for i in range(len(list_Node)):
-    list_Node[i] = pygame.transform.scale(list_Node[i], (247, 511))
 
-def MakeNode(isLeft, Index = 0):
-    NodeRect = list_Node[Index].get_rect()
+# 노드 관련
+list_Node = [[pygame.image.load('Rhythm/Upper_Pose/lunge2.png').convert_alpha(),
+              pygame.image.load('Rhythm/Upper_Pose/lunge1.png').convert_alpha()],
+             [pygame.image.load('Rhythm/Upper_Pose/bigclap1.png').convert_alpha(),
+              pygame.image.load('Rhythm/Upper_Pose/bigclap2.png').convert_alpha()]]
+
+Pose_Index = -1
+Node_Index = -1
+
+#for i in range(len(list_Node)):
+#    list_Node[i][0] = pygame.transform.scale(list_Node[i][0], (247, 511))
+#    list_Node[i][1] = pygame.transform.scale(list_Node[i][1], (247, 511))
+
+def MakeNode(isLeft, Index1 = 0, Index2 = 0):
+    NodeRect = list_Node[Index1][Index2].get_rect()
     NodeRect.top = 200
 
-    NodeRect.right = Screen_Width + list_Node[Index].get_width()
+    NodeRect.right = Screen_Width + list_Node[Index1][Index2].get_width()
     if isLeft:
-        NodeRect.left = 0 - list_Node[Index].get_width()
+        NodeRect.left = 0 - list_Node[Index1][Index2].get_width()
 
-    return [list_Node[Index], NodeRect, isLeft]
+    return [list_Node[Index1][Index2], NodeRect, isLeft]
 
 
 def Func_ChangeBackground(Color):
@@ -87,36 +97,33 @@ Background_Change = 0
 BgColor = [0, 199, 254, 0]
 
 # 배경 왼/오른쪽/가운데 이미지 불러오기
-Background_Middle = pygame.image.load("Rhythm/Smartphone.png").convert_alpha()
+Background_Middle = pygame.image.load("Rhythm/Screen/Smartphone.png").convert_alpha()
 Background_Middle = pygame.transform.scale(Background_Middle, (545, 808))
 
-Background_Laft = pygame.image.load("Rhythm/SmartphoneLeftScreen.png").convert_alpha()
+Background_Laft = pygame.image.load("Rhythm/Screen/SmartphoneLeftScreen.png").convert_alpha()
 Background_Laft = pygame.transform.scale(Background_Laft, (405, 607))
 
-Background_Right = pygame.image.load("Rhythm/SmartphoneRightScreen.png").convert_alpha()
+Background_Right = pygame.image.load("Rhythm/Screen/SmartphoneRightScreen.png").convert_alpha()
 Background_Right = pygame.transform.scale(Background_Right, (410, 607))
 
 
-BlackScreen = pygame.image.load("Rhythm/BlackScreen.png").convert_alpha()
-BlackScreen = pygame.transform.scale(BlackScreen, (Screen_Width, Screen_Height))
+BlackScreen = pygame.image.load("Rhythm/Screen/BlackScreen.png").convert_alpha()
+BlackScreen = pygame.transform.scale(BlackScreen, (1700, Screen_Height))
 
 #배경 위쪽의 그림자 생성
-ShadowRect = pygame.image.load("Rhythm/BlackScreen.png")
+ShadowRect = pygame.image.load("Rhythm/Screen/BlackScreen.png")
 ShadowRect = pygame.transform.scale(ShadowRect, (Screen_Width, 6))
 
 # 배경음악
-pygame.mixer.music.load("node/Funky Souls.mp3")
-# 효과음
-ScratchLongBGM = pygame.mixer.Sound('node/djscratch_long.mp3')
-ScratchShortBGM = pygame.mixer.Sound('node/djscratch_short.mp3')
+pygame.mixer.music.load("Rhythm/BGM/Funky_Junky.mp3")
 ######################################################################
 # 시간 계산
 Start_Ticks = pygame.time.get_ticks()
 ######################################################################
-Timer_Font = pygame.font.Font("Rhythm/CookieRun Regular.ttf", 30) # 폰트 객체 생성(폰트, 크기)
-Music_Font = pygame.font.Font("Rhythm/CookieRun Bold.ttf", 40)
-Artist_Font = pygame.font.Font("Rhythm/CookieRun Regular.ttf", 30)
-Percentage_Font = pygame.font.Font("Rhythm/CookieRun Bold.ttf", 40)
+Timer_Font = pygame.font.Font("Rhythm/Font/CookieRun Regular.ttf", 30) # 폰트 객체 생성(폰트, 크기)
+Music_Font = pygame.font.Font("Rhythm/Font/CookieRun Bold.ttf", 40)
+Artist_Font = pygame.font.Font("Rhythm/Font/CookieRun Regular.ttf", 30)
+Percentage_Font = pygame.font.Font("Rhythm/Font/CookieRun Bold.ttf", 40)
 ######################################################################
 Minus_Score = 0
 Percentage = 100
@@ -138,13 +145,21 @@ while not Crashed:
         if event.type == pygame.MOUSEBUTTONDOWN:
             print(pygame.mouse.get_pos())
 
+            if Pose_Index == -1:
+                Pose_Index = random.randrange(0, 2)
+                Node_Index = 0
+
             # 왼쪽 노드 추가하기
             if random.randrange(0, 2):
-                queue_Node.append(MakeNode(1))
+                queue_Node.append(MakeNode(1, Pose_Index, Node_Index))
 
             # 오른쪽 노드 추가하기
             else:
-                queue_Node.append(MakeNode(0))
+                queue_Node.append(MakeNode(0, Pose_Index, Node_Index))
+
+            Node_Index += 1
+            if Node_Index == 2:
+                Pose_Index = -1
 
         if event.type == pygame.KEYDOWN: # 키가 눌렸는지 확인
             if event.key == pygame.K_UP: # 위쪽 방향키
@@ -163,7 +178,7 @@ while not Crashed:
 
     if Background_Change:
         Background_Change = Func_ChangeBackground(Background_Color)
-        
+
     Screen.fill((BgColor[0], BgColor[1], BgColor[2]))
 
     # 그림자 생성
@@ -181,17 +196,17 @@ while not Crashed:
 ######################################################################
 
     # 화면에 노드 추가하기
-    if (float(Elapsed_Time) >= 2.8 and float(Elapsed_Time) <= 3):
-        if TurnOn == 0:
-            # 왼쪽 노드 추가하기
-            if random.randrange(0, 2):
-                queue_Node.append(MakeNode(1))
-
-            # 오른쪽 노드 추가하기
-            else:
-                queue_Node.append(MakeNode(0))
-            ScratchShortBGM.play()
-            TurnOn += 1
+    # if (float(Elapsed_Time) >= 2.8 and float(Elapsed_Time) <= 3):
+    #     if TurnOn == 0:
+    #         # 왼쪽 노드 추가하기
+    #         if random.randrange(0, 2):
+    #             queue_Node.append(MakeNode(1))
+    #
+    #         # 오른쪽 노드 추가하기
+    #         else:
+    #             queue_Node.append(MakeNode(0))
+    #         ScratchShortBGM.play()
+    #         TurnOn += 1
 
     # 노드를 중앙으로 움직이기
     for i in range(len(queue_Node)):
