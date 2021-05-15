@@ -3,6 +3,7 @@
 2021-05-13  14:41  Rhythm.py 모듈화 (소스코드 분할) - 최문형
 2021-05-15  11:32  정확도 계산 코드 작성 - 김창현
 2021-05-15  11:57  노드 타이밍 및 음악 가져오는 소스코드 병합 - 최문형
+2021-05-15  14:48  combo 시스템 구현 - 김창현
 '''
 
 import SongLoad as SL
@@ -13,6 +14,7 @@ import sys
 
 def start(Screen):
     BLACK = (0, 0, 0)
+    WHITE = (255, 255, 255)
     BLUE = (0, 199, 254)
     GREEN = (35, 226, 11)
     PINK = (251, 64, 174)
@@ -147,6 +149,11 @@ def start(Screen):
     Percentage = 100 # 정확도를 화면에 출력하기 위한 변수
     queue_Node = []  # 화면에 나온 노드들을 담는 배열 -> 자료구조의 queue 이용
 
+    # 콤보 관련
+    Combo_FontSize = 0
+    ComboNum = 0
+    ComboMax = 0
+
     x = 1
     PlayOn = 1
     Crashed = False
@@ -183,8 +190,9 @@ def start(Screen):
                             if 895 in range(queue_Node[0][1].left, queue_Node[0][1].left + queue_Node[0][1].width):
                                 queue_Node.pop(0)
                                 print("Right_Yes!")
-
+                                Combo_FontSize = 60
                                 PlusScore += 1
+                                ComboNum += 1
 
                                 if NodeCount != 0:
                                     Percentage = round(PlusScore / NodeCount * 100)  # 정확도
@@ -197,8 +205,9 @@ def start(Screen):
                             if 372 in range(queue_Node[0][1].left, queue_Node[0][1].left + queue_Node[0][1].width):
                                 queue_Node.pop(0)
                                 print("Left_Yes!")
-
+                                Combo_FontSize = 60
                                 PlusScore += 1
+                                ComboNum += 1
 
                                 if NodeCount != 0:
                                     Percentage = round(PlusScore / NodeCount * 100)  # 정확도
@@ -268,12 +277,25 @@ def start(Screen):
                     if NodeCount != 0:
                         Percentage = round(PlusScore / NodeCount * 100)  # 정확도
 
+                    # 콤보가 끊겼을 때, Max콤보를 업데이트하는 코드
+                    if ComboMax < ComboNum:
+                        ComboMax = ComboNum
+                    Combo_FontSize = 0
+                    ComboNum = 0
+
             # 오른쪽 노드라면
             else:
                 if tempRect.right <= (1280 / 2) + (temp.get_rect().width / 2):
                     queue_Node.pop(0)
                     if NodeCount != 0:
                         Percentage = round(PlusScore / NodeCount * 100)  # 정확도
+
+                    # 콤보가 끊겼을 때, Max콤보를 업데이트하는 코드
+                    if ComboMax < ComboNum:
+                        ComboMax = ComboNum
+                    Combo_FontSize = 0
+                    ComboNum = 0
+
 
         if not pygame.mixer.music.get_busy(): #like this!
             if PlayOn == 1:
@@ -303,6 +325,14 @@ def start(Screen):
         Screen.blit(timer, (265, 55))
         Screen.blit(ScoreNum, (1160, 45))
 
+        # 콤보수가 1이상일 경우, 화면에 나오게하는 코드
+        if ComboNum >= 1:  # 콤보가 1 이상일 경우
+            if (Combo_FontSize != 100):  # 폰트 크기 설정
+                Combo_FontSize += 20
+            ComboNum_Font = pygame.font.Font("Rhythm/Font/CookieRun Black.ttf", Combo_FontSize)
+            Combo = ComboNum_Font.render(str(ComboNum) + " COMBO", True, WHITE)
+            ComboRect = Combo.get_rect(center=(Screen_Width / 2, Screen_Height / 2 + 300))  # 콤보 폰트의 센터 설정
+            Screen.blit(Combo, ComboRect)
 
         pygame.draw.rect(Screen, (0, 0, 0), [12, 10, 1256, 25], 3) # 타이머바 틀
         pygame.draw.rect(Screen, (255, 255, 255), [15, 13, Elapsed_Time * 7.70, 19]) # 타이머바
