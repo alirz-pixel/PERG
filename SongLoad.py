@@ -81,7 +81,7 @@ def LoadSong(musicIndex):
                        [183, 8000]]
 
     elif musicIndex == 10:
-        music = "Rhythm/BGM/playing songs/Space_Town_(Brand_New_Mix)_[Update_2016.12.30](.mp3"
+        music = "Rhythm/BGM/playing songs/Space_Town.mp3"
         SongSection = [[4, 4000], [9, 5000], [12, 3000], [14, 2000], [23, 3000], [27, 2000], [31, 4000], [35, 2000],
                        [39, 4000], [43, 2000], [47, 4000], [51, 2000], [55, 4000], [59, 2000], [62, 3000], [63, 1000],
                        [73, 2000], [79, 3000], [81, 2000], [87, 3000]]
