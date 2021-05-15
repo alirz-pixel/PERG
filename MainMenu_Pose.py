@@ -44,6 +44,7 @@ def Func_Separation(Screen, Count, Cursor):
     BUTTON = [Back_Button, Left_Button, Middle_Button, Right_Button]
 
     ############################################################
+
     # 배경 이미지 불러오기
     BackScreen = pygame.image.load("MenuScreen/mainmenu/morning.png").convert_alpha()
     BackScreen = pygame.transform.scale(BackScreen, (1280, 720))
@@ -78,6 +79,19 @@ def Func_Separation(Screen, Count, Cursor):
     BottomFont = pygame.image.load("MenuScreen/Choose/BottomFont.png").convert_alpha()
     BottomFont = pygame.transform.scale(BottomFont, (326, 225))
 
+    ############################################################
+    # Song_Image
+    Daytime_Moon1 = pygame.image.load("MenuScreen/Choose/Song_Image/Daytime_Moon1.png").convert_alpha()
+    Daytime_Moon1 = pygame.transform.scale(Daytime_Moon1, (287, 287))
+
+    Daytime_Moon2 = pygame.image.load("MenuScreen/Choose/Song_Image/Daytime_Moon2.png").convert_alpha()
+    Daytime_Moon2 = pygame.transform.scale(Daytime_Moon2, (287, 287))
+
+    SongImage = [[Daytime_Moon1, Daytime_Moon2]]
+
+    SongImage_Index = 0
+
+    ############################################################
 
     # DB = DownBlue, UB = UpBlue, SB = SongBlock
     DB_Level_1_x = -20
@@ -167,6 +181,11 @@ def Func_Separation(Screen, Count, Cursor):
         if Crowd_Level_1_y > Crowd_Level_2_y:
             Crowd_Level_1_y -= 0.46*Move_y
 
+        # 가운데에 들어갈 썸네일 보여주기
+        SongImage[SongImage_Index][0].set_alpha(OpacityLevel)
+        Screen.blit(SongImage[SongImage_Index][0], (519, 117))
+
+
         # 커서의 위치 및 수정하기
         Cursor_x, Cursor_y = pygame.mouse.get_pos()  # (Screen_Width / 2 + Cursor_x, Screen_Height / 2 + Cursor_y)
         Cursor_x = Cursor_x - (Cursor[0].get_width() / 2)
@@ -174,6 +193,9 @@ def Func_Separation(Screen, Count, Cursor):
 
         for i in range(len(BUTTON)):
             if BUTTON[i].collidepoint((Cursor_x, Cursor_y)):
+                if i == 2:
+                    Screen.blit(SongImage[SongImage_Index][1], (519, 121))
+
                 Screen.blit(Cursor[1], (Cursor_x, Cursor_y))
                 isButton = True
 
@@ -199,6 +221,8 @@ def Func_Separation(Screen, Count, Cursor):
                             Screen.blit(Next, (Next_x, Next_y))
                             Exit.set_alpha(OpacityLevel)
                             Screen.blit(Exit, (Exit_x, Exit_y))
+                            SongImage[SongImage_Index][0].set_alpha(OpacityLevel)
+                            Screen.blit(SongImage[SongImage_Index][0], (519, 117))
 
                             if OpacityLevel > 0:
                                 OpacityLevel -= 18.5
