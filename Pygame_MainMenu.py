@@ -1,7 +1,32 @@
+'''
+copyright : 최문형
+2021.05.13  3:48   -  메인메뉴 -> 리듬게임 실행 + 페이드 아웃 구현
+'''
+
 import Pygame_Opening as Opening
+import Rhythm as Game
 from pygame.locals import *
 import pygame
 import sys
+
+def Func_FadeOut(Screen):
+    fade = pygame.Surface((Screen_Width, Screen_Height))
+    fade.fill((0, 0, 0))
+
+    alpha = 0
+    while True:
+        alpha += 3
+
+        fade.set_alpha(alpha)
+        Screen.blit(fade, (0, 0))
+
+        pygame.display.flip()
+        pygame.display.update()
+
+        py_clock.tick(60)
+
+        if (alpha == 300):
+            break
 
 # 파이게임 시작하기
 pygame.init()
@@ -53,9 +78,6 @@ while running:
 
     Screen.blit(Menu_Morning, (0, 0))
 
-    #Upper_Button = pygame.Rect(28, 512, 350, 100 + y)
-    #pygame.draw.rect(Screen, (255, 0, 0), Upper_Button)
-
 #################################################
     # 커서의 위치 및 수정하기
     Cursor_x, Cursor_y = pygame.mouse.get_pos() #(Screen_Width / 2 + Cursor_x, Screen_Height / 2 + Cursor_y)
@@ -70,6 +92,11 @@ while running:
             
             # 상체, 하체, 전신 게임 시작
             if Click:
+                if i == 1:
+                    Func_FadeOut(Screen)
+
+                    Game.start(Screen)
+
                 print(i)
 
     if not isButton:
