@@ -1,32 +1,15 @@
 '''
 copyright : 최문형
-2021.05.13  3:48   -  메인메뉴 -> 리듬게임 실행 + 페이드 아웃 구현
+2021.05.13  03:48   -  메인메뉴 -> 리듬게임 실행 + 페이드 아웃 구현 - 최문형
+2021.05.15  19:56   -  메인메뉴 -> MainMenu_Pose.py -> 리듬게임 실행으로 전환 -  최문형
 '''
 
+
 import Pygame_Opening as Opening
-import Rhythm as Game
+import MainMenu_Pose as MMP
 from pygame.locals import *
 import pygame
 import sys
-
-def Func_FadeOut(Screen):
-    fade = pygame.Surface((Screen_Width, Screen_Height))
-    fade.fill((0, 0, 0))
-
-    alpha = 0
-    while True:
-        alpha += 3
-
-        fade.set_alpha(alpha)
-        Screen.blit(fade, (0, 0))
-
-        pygame.display.flip()
-        pygame.display.update()
-
-        py_clock.tick(60)
-
-        if (alpha == 300):
-            break
 
 # 파이게임 시작하기
 pygame.init()
@@ -36,7 +19,7 @@ Screen_Width = 1280  # 가로 크기
 Screen_Height = 720  # 세로 크기
 Screen = pygame.display.set_mode((Screen_Width, Screen_Height))
 pygame.display.set_caption("방구석 트레이너")
-pygame.mouse.set_visible(False)
+pygame.mouse.set_visible(True)
 
 # 타이틀 이미지 불러오기
 Menu_Morning = pygame.image.load("MenuScreen/mainmenu/morning.PNG")
@@ -92,10 +75,7 @@ while running:
             
             # 상체, 하체, 전신 게임 시작
             if Click:
-                if i == 1:
-                    Func_FadeOut(Screen)
-
-                    Game.start(Screen)
+                MMP.Func_Separation(Screen, i, Cursor)
 
                 print(i)
 
