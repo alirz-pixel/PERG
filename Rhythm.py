@@ -1,4 +1,5 @@
 '''
+2021-05-08  16:21  리듬게임 도중에 치어리더와 같은 effect 나오는 소스코드 작성 - 김수영 (아직 병합되지 않음)
 2021-05-13  14:41  Rhythm.py 모듈화 (소스코드 분할) - 최문형
 2021-05-15  11:32  정확도 계산 코드 작성 - 김창현
 2021-05-15  11:57  노드 타이밍 및 음악 가져오는 소스코드 병합 - 최문형
@@ -113,11 +114,13 @@ def start(Screen):
     Background_Right = pygame.image.load("Rhythm/Screen/SmartphoneRightScreen.png").convert_alpha()
     Background_Right = pygame.transform.scale(Background_Right, (410, 607))
 
+    # Fadein을 구현하기 위한 코드
+    FadeIn = pygame.image.load("Rhythm/Screen/BlackScreen.png").convert_alpha()
+    FadeIn = pygame.transform.scale(FadeIn, (1700, Screen_Height))
 
-    BlackScreen = pygame.image.load("Rhythm/Screen/BlackScreen.png").convert_alpha()
-    BlackScreen = pygame.transform.scale(BlackScreen, (1700, Screen_Height))
+    OpacityLevel = 255
 
-    #배경 위쪽의 그림자 생성
+    # 배경 위쪽의 그림자 생성
     ShadowRect = pygame.image.load("Rhythm/Screen/BlackScreen.png")
     ShadowRect = pygame.transform.scale(ShadowRect, (Screen_Width, 6))
 
@@ -126,7 +129,7 @@ def start(Screen):
     SectionNum = 1
     Song_Time = 0
 
-    musicIndex = 2
+    musicIndex = 4
     music, SongSection, SongName = SL.LoadSong(musicIndex)
 
     pygame.mixer.music.load(music)
@@ -138,17 +141,17 @@ def start(Screen):
     Music_Font = pygame.font.Font("Rhythm/Font/CookieRun Bold.ttf", 40)
     Percentage_Font = pygame.font.Font("Rhythm/Font/CookieRun Bold.ttf", 40)
     ######################################################################
-    Minus_Score = 0
-    Percentage = 100
-    queue_Node = []
+    # 리듬게임의 노드 관련
+    PlusScore = 0    # 사용자가 얼마나 맞췄는지 판단하는 변수
+    NodeCount = 0    # 현재 까지 나온 노드의 수를 담는 변수
+    Percentage = 100 # 정확도를 화면에 출력하기 위한 변수
+    queue_Node = []  # 화면에 나온 노드들을 담는 배열 -> 자료구조의 queue 이용
 
     x = 1
     PlayOn = 1
-    OpacityLevel = 255
     Crashed = False
     ######################################################################
     while not Crashed:
-        dt = Clock.tick(30)
         Elapsed_Time = (pygame.time.get_ticks() - Start_Ticks) / 1000
         for event in pygame.event.get(): # 어떤 이벤트가 발생하였는가?
             if event.type == pygame.QUIT: # 창이 닫히는 이벤트가 발생하였는가?
@@ -180,16 +183,25 @@ def start(Screen):
                             if 895 in range(queue_Node[0][1].left, queue_Node[0][1].left + queue_Node[0][1].width):
                                 queue_Node.pop(0)
                                 print("Right_Yes!")
+
+                                PlusScore += 1
+
+                                if NodeCount != 0:
+                                    Percentage = round(PlusScore / NodeCount * 100)  # 정확도
                     except:
                         pass
 
-            if event.type == pygame.KEYDOWN: # 키가 눌렸는지 확인
                 if event.key == pygame.K_UP: # 위쪽 방향키
                     try:
                         if queue_Node[0][2] == 1: # 왼쪽에서 노드가 나옸다면
                             if 372 in range(queue_Node[0][1].left, queue_Node[0][1].left + queue_Node[0][1].width):
                                 queue_Node.pop(0)
                                 print("Left_Yes!")
+
+                                PlusScore += 1
+
+                                if NodeCount != 0:
+                                    Percentage = round(PlusScore / NodeCount * 100)  # 정확도
                     except:
                         pass
 
@@ -253,11 +265,15 @@ def start(Screen):
             if isLeft:
                 if tempRect.left >= (1280 / 2) - (temp.get_rect().width / 2):
                     queue_Node.pop(0)
+                    if NodeCount != 0:
+                        Percentage = round(PlusScore / NodeCount * 100)  # 정확도
 
             # 오른쪽 노드라면
             else:
                 if tempRect.right <= (1280 / 2) + (temp.get_rect().width / 2):
                     queue_Node.pop(0)
+                    if NodeCount != 0:
+                        Percentage = round(PlusScore / NodeCount * 100)  # 정확도
 
         if not pygame.mixer.music.get_busy(): #like this!
             if PlayOn == 1:
@@ -280,7 +296,6 @@ def start(Screen):
 
 
 
-        Percentage = round((3 - Minus_Score) / 3 * 100) # 정확도
         MusicName = Music_Font.render(SongName, True, BLACK) # 음악 제목
         ScoreNum = Percentage_Font.render(str(Percentage) + " %", True, BLACK) # 점수
 
@@ -318,6 +333,7 @@ def start(Screen):
                     Pose_Index = random.randrange(0, 2)
                     Node_Index = 0
 
+                NodeCount += 1 # 노드가 추가되었으니 현재까지 나온 노드 수를 1 더해준다.
                 # 왼쪽 노드 추가하기
                 if random.randrange(0, 2):
                     queue_Node.append(MakeNode(1, Pose_Index, Node_Index))
@@ -331,14 +347,18 @@ def start(Screen):
                     Pose_Index = -1
 
 
-        # fade out
-        BlackScreen.set_alpha(OpacityLevel)
-        Screen.blit(BlackScreen, (0, 0))
+        # fade in
+        FadeIn.set_alpha(OpacityLevel)
+        Screen.blit(FadeIn, (0, 0))
 
         if (OpacityLevel > 0):
             OpacityLevel -= 3
 
+        Clock.tick(500)
+
         pygame.display.flip()
         pygame.display.update()
 
+    cap.release()
+    cv.destroyAllWindows()
     pygame.mixer.music.stop()
