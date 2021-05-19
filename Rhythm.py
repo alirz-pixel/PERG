@@ -6,6 +6,7 @@
 2021-05-15  14:48  combo 시스템 구현 - 김창현
 2021-05-17  02:23  동작인식 이미지 추가와 동작인식을 할 수 있도록 코드 추가 - 최문형
 2021-05-17  10:23  도전과제 출력 시스템 병합 - 최문형
+2021-05-17  21:05  도전과제 출력 타이밍 개선 - 김창현 
 '''
 
 import GetPose as GP
@@ -16,7 +17,7 @@ import pygame
 import random
 import sys
 
-def start(Screen):
+def start(Screen, musicIndex = 1):
     BLACK = (0, 0, 0)
     WHITE = (255, 255, 255)
     BLUE = (0, 199, 254)
@@ -64,6 +65,7 @@ def start(Screen):
     Pose_Index = -1
     Node_Index = -1
     ######################################################################
+    # copyright : 최문형
     def Func_PoseSame(GetPose, Index1, Index2):
         if (Index1 == 0 or Index1 == 1) and Index2 == 1 and GetPose == 'standing':
             return True
@@ -146,7 +148,7 @@ def start(Screen):
     BgColor = [0, 199, 254, 0]
 
     GameOn = 1
-
+    NodeOn = 1
     # 배경 왼/오른쪽/가운데 이미지 불러오기
     Background_Middle = pygame.image.load("Rhythm/Screen/Smartphone.png").convert_alpha()
     Background_Middle = pygame.transform.scale(Background_Middle, (545, 808))
@@ -162,13 +164,14 @@ def start(Screen):
     FadeIn = pygame.transform.scale(FadeIn, (1700, Screen_Height))
 
     OpacityLevel = 255
-
     # 배경 위쪽의 그림자 생성
     ShadowRect = pygame.image.load("Rhythm/Screen/BlackScreen.png")
     ShadowRect = pygame.transform.scale(ShadowRect, (Screen_Width, 6))
 
     WhiteScreen = pygame.image.load("Rhythm/Screen/WhiteScreen.png")
     WhiteScreen = pygame.transform.scale(WhiteScreen, (478, 771))
+    
+
     ######################################################################
     # 도전과제 이미지 불러오기
 
@@ -227,7 +230,7 @@ def start(Screen):
     #도전과제 변수
     # 짜쟌 효과음
     Tada = pygame.mixer.Sound("Rhythm/BGM/ジャジャーン.mp3")
-
+    NodeBGM = pygame.mixer.Sound("Rhythm/BGM/決定、ボタン押下2.mp3")
     count = 1  # 룰렛 돈 횟수
     PlayOn = 0  # 배경음악이 켜져있는 확인하는 척도
     a = 0  # 룰렛의 가속도
@@ -239,8 +242,7 @@ def start(Screen):
     SectionNum = 1
     Song_Time = 0
 
-    musicIndex = 4
-    music, SongSection, SongName = SL.LoadSong(musicIndex)
+    music, SongSection, SongName, SongTime = SL.LoadSong(musicIndex)
     ######################################################################
     # 시간 계산
     Start_Ticks = pygame.time.get_ticks()
@@ -272,7 +274,7 @@ def start(Screen):
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     #print(pygame.mouse.get_pos())
-
+                    
                     if Pose_Index == -1:
                         Pose_Index = random.randrange(0, MAX_POSE)
                         Node_Index = 0
@@ -334,7 +336,6 @@ def start(Screen):
                 Background_Change = Func_ChangeBackground(Background_Color)
 
             Screen.fill((BgColor[0], BgColor[1], BgColor[2]))
-
             # 그림자 생성
             ShadowRect.set_alpha(70)
             Screen.blit(ShadowRect, (0, 107))
@@ -348,20 +349,20 @@ def start(Screen):
 
 
         ######################################################################
-
-            # 노드를 중앙으로 움직이기
-            for i in range(len(queue_Node)):
-                # 만약 왼쪽 노드라면
-                if queue_Node[i][2] == 1:
-                    queue_Node[i][1].left += 15
-
-                # 만약 오른쪽 노드라면
-                else:
-                    queue_Node[i][1].right -= 15
-
-            # 노드를 화면에 출력하기
-            for temp, tempRect, _, _, _ in queue_Node:
-                Screen.blit(temp, tempRect)
+            if PlayOn == 1:
+                # 노드를 중앙으로 움직이기
+                for i in range(len(queue_Node)):
+                    # 만약 왼쪽 노드라면
+                    if queue_Node[i][2] == 1:
+                        queue_Node[i][1].left += 15
+    
+                    # 만약 오른쪽 노드라면
+                    else:
+                        queue_Node[i][1].right -= 15
+    
+                # 노드를 화면에 출력하기
+                for temp, tempRect, _, _, _ in queue_Node:
+                    Screen.blit(temp, tempRect)
 
         ######################################################################
             # 배경음악
@@ -370,29 +371,22 @@ def start(Screen):
                 pygame.mixer.music.play()
                 PlayOn += 1
 
-            if not pygame.mixer.music.get_busy():  # 음악 재생이 끝나면
-                if PlayOn == 1:
-                    pygame.mixer.music.load("Rhythm/BGM/379240__westington__slot-machine.wav")
-                    pygame.mixer.music.play(-1)
-                    PlayOn -= 1
-                GameOn = 0
+            if not pygame.mixer.music.get_busy(): # 음악 재생이 끝나면
+                NodeOn = 0 
+                # 경과 시간(ms)을 1000으로 나누어서 초(s) 단위로 표시
+                Elapsed_Time = (pygame.time.get_ticks() - Start_Ticks) / 1000
+                if (Elapsed_Time > SongTime + 10):
+                    GameOn = 0
 
             if GameOn == 1:
                 # 사용자 캠 불러오기
                 _, frame = cap.read()
-
-                # 사용자의 캠을 스마트폰 화면 안에 넣기위해 인식받은 사용자의 캠의 크기를 원하는 크기만큼 자른다.
-                frame = frame[0:480, 153:486]
-                cv.imwrite('Frame.png', frame)
-
-                py_Frame = pygame.image.load("Frame.png").convert_alpha()
-                py_Frame = pygame.transform.scale(py_Frame, (478, 771))
-                Screen.blit(py_Frame, (399, 111))
-                Screen.blit(Background_Middle, (363, 43))
+                frame = cv.flip(frame, 1)
 
                 # 동작 인식 받기
                 # 동작인식을 계속 받아오면 프레임이 끊기는 문제가 발생하여
                 # 일정 딜레이(Motion_Delay)가 지나야 동작을 인식받도록 함
+            
                 Now_Time = pygame.time.get_ticks()
                 if (Now_Time > Motion_Time + Motion_Delay):
                     Motion_Time = Now_Time
@@ -429,30 +423,43 @@ def start(Screen):
                     except:
                         pass
 
-            elif GameOn == 0:  # 게임 온이 0이 되면
-                Screen.blit(WhiteScreen, (391, 68))
+                # 사용자의 캠을 스마트폰 화면 안에 넣기위해 인식받은 사용자의 캠의 크기를 원하는 크기만큼 자른다.
+                frame = frame[0:480, 153:486]
+                cv.imwrite('Frame.png', frame)
+    
+                py_Frame = pygame.image.load("Frame.png").convert_alpha()
+                py_Frame = pygame.transform.scale(py_Frame, (478, 771))
+                Screen.blit(py_Frame, (399, 111))
+                Screen.blit(Background_Middle, (363, 43))
 
-                # 밑에 코드가 다 룰렛
+            elif GameOn == 0:  # 게임 온이 0이 되면
+                if PlayOn == 1:
+                        pygame.mixer.music.load("Rhythm/BGM/379240__westington__slot-machine.wav")
+                        pygame.mixer.music.play(-1)
+                        PlayOn -= 1
+                        
+                Screen.blit(WhiteScreen, (391, 68))
+                    # 밑에 코드가 다 룰렛
                 if count < 4:
                     if count == 0:
                         if a < 50:
                             a += 1
-
+    
                     elif count == 1:
                         if a < 100:
                             a += 1
-
+    
                     elif count == 2:
                         if a > 50:
                             a -= 1
                     elif count == 3:
                         if a > 25:
                             a -= 1
-
+    
                     if count < 3:
                         if index <= 6:
                             Screen.blit(list_Achievement[index][0], (list_Achievement[index][2], 100))
-
+    
                             if list_Achievement[index][2] > 403 - list_Achievement[index][1]:
                                 list_Achievement[index][2] -= a
                             else:
@@ -464,9 +471,9 @@ def start(Screen):
                     else:
                         if index <= c_index:
                             Screen.blit(list_Achievement[index][0], (list_Achievement[index][2], 100))
-
+    
                             if index < c_index:
-
+    
                                 if list_Achievement[index][2] > 403 - list_Achievement[index][1]:
                                     list_Achievement[index][2] -= a
                                 else:
@@ -477,8 +484,8 @@ def start(Screen):
                                 else:
                                     if pygame.mixer.music.get_busy():  # like this!
                                         pygame.mixer.music.stop()
-                                    Tada.play()
-                                    count += 1
+                                        Tada.play()
+                                        count += 1
 
                 Screen.blit(list_Achievement[c_index][0], (list_Achievement[c_index][2], 100))
                 Screen.blit(Background_Laft, (0, 112))
@@ -562,26 +569,29 @@ def start(Screen):
                     #################################
 
                 # 그 간격에 따라서 노드가 나오도록 설정
-                Now_Time = pygame.time.get_ticks()
-                if (Now_Time > Song_Time + Song_DelaySec):
-                    Song_Time = Now_Time
-                    ###################### 노드 추가 ##########################
-                    if Pose_Index == -1:
-                        Pose_Index = random.randrange(0, MAX_POSE)
-                        Node_Index = 0
-
-                    NodeCount += 1 # 노드가 추가되었으니 현재까지 나온 노드 수를 1 더해준다.
-                    # 왼쪽 노드 추가하기
-                    if random.randrange(0, 2):
-                        queue_Node.append(MakeNode(1, Pose_Index, Node_Index))
-
-                    # 오른쪽 노드 추가하기
-                    else:
-                        queue_Node.append(MakeNode(0, Pose_Index, Node_Index))
-
-                    Node_Index += 1
-                    if Node_Index == 2:
-                        Pose_Index = -1
+                if PlayOn == 1 and NodeOn == 1:
+                    Now_Time = pygame.time.get_ticks()
+                    if (Now_Time > Song_Time + Song_DelaySec):
+                        Song_Time = Now_Time
+                        ###################### 노드 추가 ##########################
+                        if Pose_Index == -1:
+                            Pose_Index = random.randrange(0, MAX_POSE)
+                            Node_Index = 0
+    
+                        NodeCount += 1 # 노드가 추가되었으니 현재까지 나온 노드 수를 1 더해준다.
+                        # 왼쪽 노드 추가하기
+                        if random.randrange(0, 2):
+                            queue_Node.append(MakeNode(1, Pose_Index, Node_Index))
+                            NodeBGM.play()
+    
+                        # 오른쪽 노드 추가하기
+                        else:
+                            queue_Node.append(MakeNode(0, Pose_Index, Node_Index))
+                            NodeBGM.play()
+    
+                        Node_Index += 1
+                        if Node_Index == 2:
+                            Pose_Index = -1
 
 
             # fade in

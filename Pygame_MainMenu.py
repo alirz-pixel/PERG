@@ -5,6 +5,7 @@ copyright : 최문형
 '''
 
 
+import time
 import Pygame_Opening as Opening
 import MainMenu_Pose as MMP
 from pygame.locals import *
@@ -19,7 +20,7 @@ Screen_Width = 1280  # 가로 크기
 Screen_Height = 720  # 세로 크기
 Screen = pygame.display.set_mode((Screen_Width, Screen_Height))
 pygame.display.set_caption("방구석 트레이너")
-pygame.mouse.set_visible(True)
+pygame.mouse.set_visible(False)
 
 # 타이틀 이미지 불러오기
 Menu_Morning = pygame.image.load("MenuScreen/mainmenu/morning.PNG")
@@ -39,21 +40,36 @@ Cursor[1] = pygame.transform.scale(Cursor[1], (80, 91))
 
 Click = False
 isButton = False
+ClickBGM = pygame.mixer.Sound("Rhythm/BGM/決定、ボタン押下39.mp3")
+
+
+
 
 #################################################
 py_clock = pygame.time.Clock()
 
+time.sleep(4)
 Opening.Func_Openning(Screen)
+pygame.mixer.music.load("Rhythm/BGM/In_Rejection.mp3")
+pygame.mixer.music.play(-1)
 Opening.Func_Title(Screen)
+pygame.mixer.music.stop()
+
+PlayOn = 0 # 배경음악이 켜져있는가 유무 
 running = True
-while running:
+while running:        
     isButton = False
     Click = False
-
+    
+    if PlayOn == 0:
+        pygame.mixer.music.load("Rhythm/BGM/Cat_life.mp3")
+        pygame.mixer.music.play(-1)
+        PlayOn += 1
     # pygame 이벤트
     for event in pygame.event.get():
         if event.type == pygame.MOUSEBUTTONDOWN:
             Click = True
+            ClickBGM.play()
 
         if event.type == pygame.QUIT:
             running = False
@@ -76,7 +92,7 @@ while running:
             # 상체, 하체, 전신 게임 시작
             if Click:
                 MMP.Func_Separation(Screen, i, Cursor)
-
+    
                 print(i)
 
     if not isButton:

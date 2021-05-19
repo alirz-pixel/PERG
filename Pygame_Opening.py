@@ -2,6 +2,7 @@ from pygame.locals import *
 import sys
 import pygame
 
+pygame.init() 
 
 # 프로그램 정보 지정
 py_size = (1280, 720)
@@ -18,6 +19,7 @@ py_openingImage1 = pygame.transform.scale(py_openingImage1, py_size)
 py_TitleImage = pygame.image.load('MenuScreen/opening/logo.PNG')
 py_TitleImage = pygame.transform.scale(py_TitleImage, py_size)
 
+SceneBGM = pygame.mixer.Sound("Rhythm/BGM/スイッチを押す.mp3")
 def Func_Openning(Screen):
     fade = pygame.Surface(py_size)
     fade.fill((0,0,0))
@@ -62,6 +64,7 @@ def Func_Openning(Screen):
 
         # fade in, 또는 fade out인지 설정
         if alpha == 0:
+            SceneBGM.play()
             isFadein = False
 
         elif alpha == 300:
@@ -83,8 +86,8 @@ def Func_Title(Screen):
                 sys.exit()
 
             if event.type == KEYDOWN:
+                pygame.mixer.music.stop()
                 running = False
-
         else:
             Screen.blit(py_TitleImage, (0, 0))
 

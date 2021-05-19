@@ -183,7 +183,7 @@ def Func_Separation(Screen, Count, Cursor):
 
         # 가운데에 들어갈 썸네일 보여주기
         SongImage[SongImage_Index][0].set_alpha(OpacityLevel)
-        Screen.blit(SongImage[SongImage_Index][0], (519, 117))
+        Screen.blit(SongImage[SongImage_Index][0], (521, 120))
 
 
         # 커서의 위치 및 수정하기
@@ -194,7 +194,7 @@ def Func_Separation(Screen, Count, Cursor):
         for i in range(len(BUTTON)):
             if BUTTON[i].collidepoint((Cursor_x, Cursor_y)):
                 if i == 2:
-                    Screen.blit(SongImage[SongImage_Index][1], (519, 121))
+                    Screen.blit(SongImage[SongImage_Index][1], (521, 120))
 
                 Screen.blit(Cursor[1], (Cursor_x, Cursor_y))
                 isButton = True
@@ -222,7 +222,7 @@ def Func_Separation(Screen, Count, Cursor):
                             Exit.set_alpha(OpacityLevel)
                             Screen.blit(Exit, (Exit_x, Exit_y))
                             SongImage[SongImage_Index][0].set_alpha(OpacityLevel)
-                            Screen.blit(SongImage[SongImage_Index][0], (519, 117))
+                            Screen.blit(SongImage[SongImage_Index][0], (521, 120))
 
                             if OpacityLevel > 0:
                                 OpacityLevel -= 18.5
@@ -237,7 +237,7 @@ def Func_Separation(Screen, Count, Cursor):
 
                     if i == 2: # 가운데 클릭
                         Func_FadeOut(Screen)
-                        Game.start(Screen)
+                        Game.start(Screen, 1)
                         Crashed = True
                     
                     if i == 1: # 왼쪽 버튼 클릭
