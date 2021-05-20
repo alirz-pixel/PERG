@@ -1,8 +1,9 @@
 '''
+2021.05.01  10:24 기본적인 틀 작성 - 최문형
+2021.05.01  10:25 ~  추가 동작 인식을 위한 거리 및 각도 추가 (이범석)
+
 최문형 - 몸에 점들을 찍고, 그 점들에 대한 각도 및 거리 구현
 이범석 - 추가된 운동동작에 필요한 각도 및 거리 구현
-
-주석에 (이범석) 이 없을 시, 최문형이 구현
 '''
 
 import mediapipe as mp
@@ -10,6 +11,7 @@ import numpy as np
 import math
 import cv2
 
+# 각도 계산을 위한 함수 (최문형)
 def calculate_angle(a, b, c):
     a = np.array(a)  # First
     b = np.array(b)  # Mid
@@ -31,7 +33,7 @@ mp_drawing = mp.solutions.drawing_utils
 
 mp_drawing.DrawingSpec(color=(0, 0, 255), thickness=2, circle_radius=2)
 
-# opencv의 frame을 넘겨받아야 함.
+# opencv의 frame을 입력받고 점들의 각도 및 거리 반환하는 함수 (최문형).
 def pose_estimation(frame, holistic, dict_PoseAngle, dict_PoseLength, dict_PoseLower, white_img = 0):
     image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     results = holistic.process(image)
@@ -44,7 +46,7 @@ def pose_estimation(frame, holistic, dict_PoseAngle, dict_PoseLength, dict_PoseL
     except:
         pass
 
-    # LeftElbow 각도 구하기
+    # LeftElbow 각도 구하기 (최문형)
     try:
         LeftShoulder = [landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x,
                         landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].y]
@@ -61,7 +63,7 @@ def pose_estimation(frame, holistic, dict_PoseAngle, dict_PoseLength, dict_PoseL
         dict_PoseAngle['LeftElbow'] = -1
 
 
-    # RightElbow 각도 구하기
+    # RightElbow 각도 구하기 (최문형)
     try:
         RightShoulder = [landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x,
                         landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].y]
@@ -78,7 +80,7 @@ def pose_estimation(frame, holistic, dict_PoseAngle, dict_PoseLength, dict_PoseL
         dict_PoseAngle['RightElbow'] = -1
 
 
-    # Leftshoulder 각도 구하기
+    # Leftshoulder 각도 구하기 (최문형)
     try:
         LeftElbow = [landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x,
                      landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].y]
@@ -95,7 +97,7 @@ def pose_estimation(frame, holistic, dict_PoseAngle, dict_PoseLength, dict_PoseL
         dict_PoseAngle['LeftShoulder'] = -1
 
 
-    # Rightshoulder 각도 구하기
+    # Rightshoulder 각도 구하기 (최문형)
     try:
         RightElbow = [landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].x,
                      landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].y]
@@ -112,7 +114,7 @@ def pose_estimation(frame, holistic, dict_PoseAngle, dict_PoseLength, dict_PoseL
         dict_PoseAngle['RightShoulder'] = -1
 
 
-    # LeftHip 각도 구하기
+    # LeftHip 각도 구하기 (최문형)
     try:
         LeftShoulder = [landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x,
                         landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].y]
@@ -129,7 +131,7 @@ def pose_estimation(frame, holistic, dict_PoseAngle, dict_PoseLength, dict_PoseL
         dict_PoseAngle['LeftHip'] = -1
 
 
-    # RightHip 각도 구하기
+    # RightHip 각도 구하기 (최문형)
     try:
         RightShoulder = [landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x,
                         landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].y]
@@ -146,7 +148,7 @@ def pose_estimation(frame, holistic, dict_PoseAngle, dict_PoseLength, dict_PoseL
         dict_PoseAngle['RightHip'] = -1
 
 
-    # Right_Knee 각도 구하기
+    # Right_Knee 각도 구하기 (최문형)
     try:
         RightHip = [landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].x,
                    landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].y]
@@ -163,7 +165,7 @@ def pose_estimation(frame, holistic, dict_PoseAngle, dict_PoseLength, dict_PoseL
         dict_PoseAngle['RightKnee'] = -1
 
 
-    # Left_Knee 각도 구하기
+    # Left_Knee 각도 구하기 (최문형)
     try:
         LeftHip = [landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].x,
                    landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].y]
@@ -404,7 +406,7 @@ def pose_estimation(frame, holistic, dict_PoseAngle, dict_PoseLength, dict_PoseL
         dict_PoseAngle['LW-LA-RA'] = -1
 
 
-    # 16번과 14번 사이 거리 구하기
+    # 16번과 14번 사이 거리 구하기 (최문형)
     try:
         RightWrist = [landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].x,
                       landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].y]
@@ -420,7 +422,7 @@ def pose_estimation(frame, holistic, dict_PoseAngle, dict_PoseLength, dict_PoseL
         dict_PoseLength['16, 14'] = -1
 
 
-    # 14번과 12번 사이 거리 구하기
+    # 14번과 12번 사이 거리 구하기 (최문형)
     try:
         RightElbow = [landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].x,
                       landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].y]
@@ -436,7 +438,7 @@ def pose_estimation(frame, holistic, dict_PoseAngle, dict_PoseLength, dict_PoseL
         dict_PoseLength['14, 12'] = -1
 
 
-    # 24번과 12번 사이 거리 구하기
+    # 24번과 12번 사이 거리 구하기 (최문형)
     try:
         RightShoulder = [landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x,
                          landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].y]
@@ -452,7 +454,7 @@ def pose_estimation(frame, holistic, dict_PoseAngle, dict_PoseLength, dict_PoseL
         dict_PoseLength['24, 12'] = -1
 
 
-    # 26번과 24번 사이 거리 구하기
+    # 26번과 24번 사이 거리 구하기 (최문형)
     try:
         RightHip = [landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].x,
                     landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].y]
@@ -468,7 +470,7 @@ def pose_estimation(frame, holistic, dict_PoseAngle, dict_PoseLength, dict_PoseL
         dict_PoseLength['26, 24'] = -1
 
 
-    # 28번과 26번 사이 거리 구하기
+    # 28번과 26번 사이 거리 구하기 (최문형)
     try:
         RightKnee = [landmarks[mp_pose.PoseLandmark.RIGHT_KNEE.value].x,
                      landmarks[mp_pose.PoseLandmark.RIGHT_KNEE.value].y]
@@ -485,7 +487,7 @@ def pose_estimation(frame, holistic, dict_PoseAngle, dict_PoseLength, dict_PoseL
 
 
 
-    # 15번과 13번 사이 거리 구하기
+    # 15번과 13번 사이 거리 구하기 (최문형)
     try:
         LeftWrist = [landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].x,
                      landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y]
@@ -501,7 +503,7 @@ def pose_estimation(frame, holistic, dict_PoseAngle, dict_PoseLength, dict_PoseL
         dict_PoseLength['15, 13'] = -1
 
 
-    # 13번과 11번 사이 거리 구하기
+    # 13번과 11번 사이 거리 구하기 (최문형)
     try:
         LeftElbow = [landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x,
                       landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].y]
@@ -517,7 +519,7 @@ def pose_estimation(frame, holistic, dict_PoseAngle, dict_PoseLength, dict_PoseL
         dict_PoseLength['13, 11'] = -1
 
 
-    # 23번과 11번 사이 거리 구하기
+    # 23번과 11번 사이 거리 구하기 (최문형)
     try:
         LeftShoulder = [landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x,
                         landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].y]
@@ -533,7 +535,7 @@ def pose_estimation(frame, holistic, dict_PoseAngle, dict_PoseLength, dict_PoseL
         dict_PoseLength['23, 11'] = -1
 
 
-    # 25번과 23번 사이 거리 구하기
+    # 25번과 23번 사이 거리 구하기 (최문형)
     try:
         LeftHip = [landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].x,
                    landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].y]
@@ -548,7 +550,7 @@ def pose_estimation(frame, holistic, dict_PoseAngle, dict_PoseLength, dict_PoseL
     except:
         dict_PoseLength['25, 23'] = -1
 
-    # 27번과 25번 사이 거리 구하기
+    # 27번과 25번 사이 거리 구하기 (최문형)
     try:
         LeftKnee = [landmarks[mp_pose.PoseLandmark.LEFT_KNEE.value].x,
                      landmarks[mp_pose.PoseLandmark.LEFT_KNEE.value].y]
@@ -637,6 +639,24 @@ def pose_estimation(frame, holistic, dict_PoseAngle, dict_PoseLength, dict_PoseL
 
     except:
         dict_PoseLength['14, 13'] = -1
+
+    # 24번과 23번 사이 거리 구하기 (이범석)
+    try:
+        RightHip = [landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].x,
+                    landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].y]
+        LeftHip = [landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].x,
+                   landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].y]
+
+        length = math.hypot(RightHip[0] - LeftHip[0], RightHip[1] - LeftHip[1]) * 100
+        cv2.putText(image, str(int(length)),
+                    tuple(np.multiply(RightHip, [640, 550]).astype(int)),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA
+                    )
+
+        dict_PoseLength['24, 23'] = length
+
+    except:
+        dict_PoseLength['24, 23'] = -1
 
     # 26번과 25번 사이 거리 구하기 (이범석)
     try:
@@ -757,6 +777,42 @@ def pose_estimation(frame, holistic, dict_PoseAngle, dict_PoseLength, dict_PoseL
 
     except:
         dict_PoseLength['24, 16'] = -1
+
+    # 25번과 13번 사이 거리 구하기 (이범석)
+    try:
+        LeftElbow = [landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x,
+                     landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].y]
+        LeftKnee = [landmarks[mp_pose.PoseLandmark.LEFT_KNEE.value].x,
+                    landmarks[mp_pose.PoseLandmark.LEFT_KNEE.value].y]
+
+        length = math.hypot(LeftElbow[0] - LeftKnee[0], LeftElbow[1] - LeftKnee[1]) * 100
+        cv2.putText(image, str(int(length)),
+                    tuple(np.multiply(LeftElbow, [640, 550]).astype(int)),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA
+                    )
+
+        dict_PoseLength['25, 13'] = length
+
+    except:
+        dict_PoseLength['25, 13'] = -1
+
+    # 26번과 14번 사이 거리 구하기 (이범석)
+    try:
+        RightElbow = [landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].x,
+                      landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].y]
+        RightKnee = [landmarks[mp_pose.PoseLandmark.RIGHT_KNEE.value].x,
+                     landmarks[mp_pose.PoseLandmark.RIGHT_KNEE.value].y]
+
+        length = math.hypot(RightElbow[0] - RightKnee[0], RightElbow[1] - RightKnee[1]) * 100
+        cv2.putText(image, str(int(length)),
+                    tuple(np.multiply(RightElbow, [640, 550]).astype(int)),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA
+                    )
+
+        dict_PoseLength['26, 14'] = length
+
+    except:
+        dict_PoseLength['26, 14'] = -1
 
     #완전히 허리를 숙였는지 인식(05.15 이범석)
     try:

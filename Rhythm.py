@@ -69,9 +69,9 @@ def start(Screen, musicIndex = 1):
     def Func_PoseSame(GetPose, Index1, Index2):
         if (Index1 == 0 or Index1 == 1) and Index2 == 1 and GetPose == 'standing':
             return True
-        if Index1 == 0 and Index2 == 0 and GetPose == 'Right-Front&BackRaise':
+        if Index1 == 0 and Index2 == 0 and GetPose == 'Left-Front&BackRaise':
             return True
-        if Index1 == 1 and Index2 == 0 and GetPose == 'Left-Front&BackRaise':
+        if Index1 == 1 and Index2 == 0 and GetPose == 'Right-Front&BackRaise':
             return True
         if Index1 == 2 and Index2 == 0 and GetPose == 'chestfly-1':
             return True
