@@ -19,7 +19,7 @@ py_openingImage1 = pygame.transform.scale(py_openingImage1, py_size)
 py_TitleImage = pygame.image.load('MenuScreen/opening/logo.PNG')
 py_TitleImage = pygame.transform.scale(py_TitleImage, py_size)
 
-SceneBGM = pygame.mixer.Sound("Rhythm/BGM/スイッチを押す.mp3")
+SceneBGM = pygame.mixer.Sound("MenuScreen/sound/スイッチを押す.mp3")
 def Func_Openning(Screen):
     fade = pygame.Surface(py_size)
     fade.fill((0,0,0))

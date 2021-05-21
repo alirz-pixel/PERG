@@ -5,7 +5,6 @@ copyright : 최문형
 '''
 
 
-import time
 import Pygame_Opening as Opening
 import MainMenu_Pose as MMP
 from pygame.locals import *
@@ -40,7 +39,7 @@ Cursor[1] = pygame.transform.scale(Cursor[1], (80, 91))
 
 Click = False
 isButton = False
-ClickBGM = pygame.mixer.Sound("Rhythm/BGM/決定、ボタン押下39.mp3")
+ClickBGM = pygame.mixer.Sound("MenuScreen/sound/決定、ボタン押下39.mp3")
 
 
 
@@ -48,9 +47,8 @@ ClickBGM = pygame.mixer.Sound("Rhythm/BGM/決定、ボタン押下39.mp3")
 #################################################
 py_clock = pygame.time.Clock()
 
-time.sleep(4)
 Opening.Func_Openning(Screen)
-pygame.mixer.music.load("Rhythm/BGM/In_Rejection.mp3")
+pygame.mixer.music.load("MenuScreen/sound/In_Rejection.mp3")
 pygame.mixer.music.play(-1)
 Opening.Func_Title(Screen)
 pygame.mixer.music.stop()
@@ -62,7 +60,7 @@ while running:
     Click = False
     
     if PlayOn == 0:
-        pygame.mixer.music.load("Rhythm/BGM/Cat_life.mp3")
+        pygame.mixer.music.load("MenuScreen/sound/Cat_life.mp3")
         pygame.mixer.music.play(-1)
         PlayOn += 1
     # pygame 이벤트
