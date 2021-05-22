@@ -539,7 +539,7 @@ def start(Screen, partIndex, musicIndex = 1):
                 cv.imwrite('Frame.png', frame)
     
                 py_Frame = pygame.image.load("Frame.png").convert_alpha()
-                py_Frame = pygame.transform.scale(py_Frame, (478, 771))
+                py_Frame = pygame.transform.scale(py_Frame, (478, 690))
                 Screen.blit(py_Frame, (399, 111))
                 Screen.blit(Background_Middle, (363, 43))
 
