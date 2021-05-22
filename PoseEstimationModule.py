@@ -1,6 +1,6 @@
 '''
 2021.05.01  10:24 기본적인 틀 작성 - 최문형
-2021.05.01  10:25 ~  추가 동작 인식을 위한 거리 및 각도 추가 (이범석)
+2021.05.01  10:25 ~ 2020.05.22  9:30 추가 동작 인식을 위한 거리 및 각도 추가 (이범석)
 
 최문형 - 몸에 점들을 찍고, 그 점들에 대한 각도 및 거리 구현
 이범석 - 추가된 운동동작에 필요한 각도 및 거리 구현
@@ -405,6 +405,38 @@ def pose_estimation(frame, holistic, dict_PoseAngle, dict_PoseLength, dict_PoseL
     except:
         dict_PoseAngle['LW-LA-RA'] = -1
 
+    # LeftHip-RightHip-RightKnee 각도 구하기(이범석)
+    try:
+        LeftHip = [landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].x,
+                     landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].y]
+        RightHip = [landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].x,
+                      landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].y]
+        RightKnee = [landmarks[mp_pose.PoseLandmark.RIGHT_KNEE.value].x,
+                     landmarks[mp_pose.PoseLandmark.RIGHT_KNEE.value].y]
+
+        angle = calculate_angle(LeftHip, RightHip, RightKnee)
+
+        dict_PoseAngle['LH-RH-RK'] = angle
+
+    except:
+        dict_PoseAngle['LH-RH-RK'] = -1
+
+    # RightHip-LeftHip-LeftKnee 각도 구하기(이범석)
+    try:
+        RightHip = [landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].x,
+                      landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].y]
+        LeftHip = [landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].x,
+                     landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].y]
+        LeftKnee = [landmarks[mp_pose.PoseLandmark.LEFT_KNEE.value].x,
+                     landmarks[mp_pose.PoseLandmark.LEFT_KNEE.value].y]
+
+        angle = calculate_angle(RightHip, LeftHip, LeftKnee)
+
+        dict_PoseAngle['RH-LH-LK'] = angle
+
+    except:
+        dict_PoseAngle['RH-LH-LK'] = -1
+
 
     # 16번과 14번 사이 거리 구하기 (최문형)
     try:
@@ -648,10 +680,6 @@ def pose_estimation(frame, holistic, dict_PoseAngle, dict_PoseLength, dict_PoseL
                    landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].y]
 
         length = math.hypot(RightHip[0] - LeftHip[0], RightHip[1] - LeftHip[1]) * 100
-        cv2.putText(image, str(int(length)),
-                    tuple(np.multiply(RightHip, [640, 550]).astype(int)),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA
-                    )
 
         dict_PoseLength['24, 23'] = length
 
@@ -786,10 +814,6 @@ def pose_estimation(frame, holistic, dict_PoseAngle, dict_PoseLength, dict_PoseL
                     landmarks[mp_pose.PoseLandmark.LEFT_KNEE.value].y]
 
         length = math.hypot(LeftElbow[0] - LeftKnee[0], LeftElbow[1] - LeftKnee[1]) * 100
-        cv2.putText(image, str(int(length)),
-                    tuple(np.multiply(LeftElbow, [640, 550]).astype(int)),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA
-                    )
 
         dict_PoseLength['25, 13'] = length
 
@@ -804,11 +828,7 @@ def pose_estimation(frame, holistic, dict_PoseAngle, dict_PoseLength, dict_PoseL
                      landmarks[mp_pose.PoseLandmark.RIGHT_KNEE.value].y]
 
         length = math.hypot(RightElbow[0] - RightKnee[0], RightElbow[1] - RightKnee[1]) * 100
-        cv2.putText(image, str(int(length)),
-                    tuple(np.multiply(RightElbow, [640, 550]).astype(int)),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA
-                    )
-
+        
         dict_PoseLength['26, 14'] = length
 
     except:

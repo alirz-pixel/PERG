@@ -68,13 +68,14 @@ def UpperBody():
                 print('Right-Front&BackRaise')
                 return 'Right-Front&BackRaise'
 def LowerBody():
-
     # 기본 기립자세 인식 (이범석)
-    if dict_PoseLength['23, 15'] <= 5 and dict_PoseLength['24, 16'] <= 5:
-        if dict_PoseAngle['LeftHip'] >= 160 and dict_PoseAngle['RightHip']:
-            if dict_PoseAngle['LeftKnee'] >= 160 and dict_PoseAngle['RightKnee'] >= 160:
-                print('standing')
-                return 'standing'
+    if dict_PoseLength['23, 15'] <= 7.5 and dict_PoseLength['24, 16'] <= 7.5:
+        if dict_PoseLength['12, 11'] >= dict_PoseLength['26, 25']:
+            if dict_PoseAngle['LeftHip'] >= 165 and dict_PoseAngle['RightHip'] >= 165:
+                if dict_PoseAngle['LeftKnee'] >= 165 and dict_PoseAngle['RightKnee'] >= 165:
+                    print('standing')
+                    return 'standing'
+                
     # 스쿼트 인식 (이범석)
     if 0.4 <= dict_PoseLength['26, 24'] / dict_PoseLength['28, 26'] <= 0.9 \
             and 0.4 <= dict_PoseLength['25, 23'] / dict_PoseLength['27, 25'] <= 0.9:
@@ -103,18 +104,32 @@ def LowerBody():
 
 
 def FullBody():
-    # Full-Body Motion 1-R (이범석)
-    if dict_PoseAngle['LeftElbow'] <= 110 and dict_PoseAngle['RightElbow'] >= 150:
-        if dict_PoseAngle['RightShoulder'] >= 80 and dict_PoseAngle['LeftShoulder'] <= 50:
-            if 20 <= dict_PoseAngle['RA-RK-LA'] <= 70:
-                print('Full-Body Motion 1-R')
-                return 'Full-Body Motion 1-R'
-    # Full-Body Motion 1-L (이범석)
-    if dict_PoseAngle['RightElbow'] <= 110 and dict_PoseAngle['LeftElbow'] >= 150:
-        if dict_PoseAngle['LeftShoulder'] >= 80 and dict_PoseAngle['RightShoulder'] <= 50:
-            if 20 <= dict_PoseAngle['LA-LK-RA'] <= 70:
-                print('Full-Body Motion 1-L')
-                return 'Full-Body Motion 1-L'
+    # 기본 기립자세 인식 (이범석)
+    if dict_PoseLength['23, 15'] <= 7.5 and dict_PoseLength['24, 16'] <= 7.5:
+        if dict_PoseLength['12, 11'] >= dict_PoseLength['26, 25']:
+            if dict_PoseAngle['LeftHip'] >= 165 and dict_PoseAngle['RightHip'] >= 165:
+                if dict_PoseAngle['LeftKnee'] >= 165 and dict_PoseAngle['RightKnee'] >= 165:
+                    print('standing')
+                    return 'standing'
+                
+    # Full-Body Motion 1-R
+    if 50 <= dict_PoseAngle['LeftElbow'] <= 125 and dict_PoseAngle['RightElbow'] >= 150:
+        if 60 <= dict_PoseAngle['RightShoulder'] <= 120 and dict_PoseAngle['LeftShoulder'] <= 50:
+            if 15 <= dict_PoseAngle['RA-RK-LA'] <= 90:
+                if 140 <= dict_PoseAngle['LeftHip'] and 140 <= dict_PoseAngle['RightHip']:
+                    if 40 <= dict_PoseAngle['RH-LH-LK'] <= 90 and 40 <= dict_PoseAngle['LH-RH-RK'] <= 90:
+                        if dict_PoseLength['26, 25'] / dict_PoseLength['24, 23'] <= 1.5:
+                            print('Full-Body Motion 1-R')
+                            return 'Full-Body Motion 1-R'
+    # Full-Body Motion 1-L
+    if dict_PoseAngle['RightElbow'] <= 125 and dict_PoseAngle['LeftElbow'] >= 150:
+        if 60 <= dict_PoseAngle['LeftShoulder'] <= 120 and dict_PoseAngle['RightShoulder'] <= 50:
+            if 15 <= dict_PoseAngle['LA-LK-RA'] <= 90:
+                if 140 <= dict_PoseAngle['LeftHip'] and 140 <= dict_PoseAngle['RightHip']:
+                    if 40 <= dict_PoseAngle['LH-RH-RK'] <= 90 and 40 <= dict_PoseAngle['RH-LH-LK'] <= 90:
+                        if dict_PoseLength['26, 25'] / dict_PoseLength['24, 23'] <= 1.5:
+                            print('Full-Body Motion 1-L')
+                            return 'Full-Body Motion 1-L'
 
     # Full-Body Motion 2 (이범석, 최문형)
     if 150 <= dict_PoseAngle['LeftShoulder'] and 150 <= dict_PoseAngle['RightShoulder']:
