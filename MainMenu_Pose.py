@@ -4,6 +4,7 @@
 2021.05.15  19:56 fadeout 추가 - 김수영
 2021.05.15  20:32 마우스 및 버튼 추가 - 최문형
 2021.05.15  21:24 위에서 추가한 fadeout 기능 병합 - 최문형
+2021.05.22  03:12 ~ 07:56  Song_Image 제작 및 코드 삽입
 '''
 
 import Rhythm as Game
@@ -80,16 +81,69 @@ def Func_Separation(Screen, Count, Cursor):
     BottomFont = pygame.transform.scale(BottomFont, (326, 225))
 
     ############################################################
-    # Song_Image
+    # Song_Image (copyright 최문형)
+    ImageSize = (258, 258)
+
     Daytime_Moon1 = pygame.image.load("MenuScreen/Choose/Song_Image/Daytime_Moon1.png").convert_alpha()
-    Daytime_Moon1 = pygame.transform.scale(Daytime_Moon1, (287, 287))
+    Daytime_Moon1 = pygame.transform.scale(Daytime_Moon1, ImageSize)
 
     Daytime_Moon2 = pygame.image.load("MenuScreen/Choose/Song_Image/Daytime_Moon2.png").convert_alpha()
-    Daytime_Moon2 = pygame.transform.scale(Daytime_Moon2, (287, 287))
+    Daytime_Moon2 = pygame.transform.scale(Daytime_Moon2, ImageSize)
 
-    SongImage = [[Daytime_Moon1, Daytime_Moon2]]
+    dreamer1 = pygame.image.load("MenuScreen/Choose/Song_Image/dreamer1.png").convert_alpha()
+    dreamer1 = pygame.transform.scale(dreamer1, ImageSize)
+
+    dreamer2 = pygame.image.load("MenuScreen/Choose/Song_Image/dreamer2.png").convert_alpha()
+    dreamer2 = pygame.transform.scale(dreamer2, ImageSize)
+
+    FilmClash1 = pygame.image.load("MenuScreen/Choose/Song_Image/FilmClash1.png").convert_alpha()
+    FilmClash1 = pygame.transform.scale(FilmClash1, ImageSize)
+
+    FilmClash2 = pygame.image.load("MenuScreen/Choose/Song_Image/FilmClash2.png").convert_alpha()
+    FilmClash2 = pygame.transform.scale(FilmClash2, ImageSize)
+
+    Fota1 = pygame.image.load("MenuScreen/Choose/Song_Image/FOTA1.png").convert_alpha()
+    Fota1 = pygame.transform.scale(Fota1, ImageSize)
+
+    Fota2 = pygame.image.load("MenuScreen/Choose/Song_Image/FOTA2.png").convert_alpha()
+    Fota2 = pygame.transform.scale(Fota2, ImageSize)
+
+    FunkyJunky1 = pygame.image.load("MenuScreen/Choose/Song_Image/FunkyJunky1.png").convert_alpha()
+    FunkyJunky1 = pygame.transform.scale(FunkyJunky1, ImageSize)
+
+    FunkyJunky2 = pygame.image.load("MenuScreen/Choose/Song_Image/FunkyJunky2.png").convert_alpha()
+    FunkyJunky2 = pygame.transform.scale(FunkyJunky2, ImageSize)
+
+    NewFuture1 = pygame.image.load("MenuScreen/Choose/Song_Image/NewFuture1.png").convert_alpha()
+    NewFuture1 = pygame.transform.scale(NewFuture1, ImageSize)
+
+    NewFuture2 = pygame.image.load("MenuScreen/Choose/Song_Image/NewFuture2.png").convert_alpha()
+    NewFuture2 = pygame.transform.scale(NewFuture2, ImageSize)
+
+    SpaceTown1 = pygame.image.load("MenuScreen/Choose/Song_Image/SpaceTown1.png").convert_alpha()
+    SpaceTown1 = pygame.transform.scale(SpaceTown1, ImageSize)
+
+    SpaceTown2 = pygame.image.load("MenuScreen/Choose/Song_Image/SpaceTown2.png").convert_alpha()
+    SpaceTown2 = pygame.transform.scale(SpaceTown2, ImageSize)
+
+    Tracker1 = pygame.image.load("MenuScreen/Choose/Song_Image/Tracker1.png").convert_alpha()
+    Tracker1 = pygame.transform.scale(Tracker1, ImageSize)
+
+    Tracker2 = pygame.image.load("MenuScreen/Choose/Song_Image/Tracker2.png").convert_alpha()
+    Tracker2 = pygame.transform.scale(Tracker2, ImageSize)
+
+    SwingSwing1 = pygame.image.load("MenuScreen/Choose/Song_Image/SwingSwing1.png").convert_alpha()
+    SwingSwing1 = pygame.transform.scale(SwingSwing1, ImageSize)
+
+    SwingSwing2 = pygame.image.load("MenuScreen/Choose/Song_Image/SwingSwing2.png").convert_alpha()
+    SwingSwing2 = pygame.transform.scale(SwingSwing2, ImageSize)
+
+
+    SongImage = [[Daytime_Moon1, Daytime_Moon2], [SwingSwing1, SwingSwing2], [Tracker1, Tracker2], [Fota1, Fota2], [NewFuture1, NewFuture2],
+                 [dreamer1, dreamer2], [FilmClash1, FilmClash2], [FunkyJunky1, FunkyJunky2], [SpaceTown1, SpaceTown2]]
 
     SongImage_Index = 0
+    SongImage_MAX = 9
 
     ############################################################
 
@@ -182,8 +236,10 @@ def Func_Separation(Screen, Count, Cursor):
             Crowd_Level_1_y -= 0.46*Move_y
 
         # 가운데에 들어갈 썸네일 보여주기
+        SongImage_Position = (Screen_Width/2 - 103, Screen_Height/2 - 223)
+
         SongImage[SongImage_Index][0].set_alpha(OpacityLevel)
-        Screen.blit(SongImage[SongImage_Index][0], (521, 120))
+        Screen.blit(SongImage[SongImage_Index][0], SongImage_Position)
 
 
         # 커서의 위치 및 수정하기
@@ -194,7 +250,7 @@ def Func_Separation(Screen, Count, Cursor):
         for i in range(len(BUTTON)):
             if BUTTON[i].collidepoint((Cursor_x, Cursor_y)):
                 if i == 2:
-                    Screen.blit(SongImage[SongImage_Index][1], (521, 120))
+                    Screen.blit(SongImage[SongImage_Index][1], SongImage_Position)
 
                 Screen.blit(Cursor[1], (Cursor_x, Cursor_y))
                 isButton = True
@@ -237,14 +293,20 @@ def Func_Separation(Screen, Count, Cursor):
 
                     if i == 2: # 가운데 클릭
                         Func_FadeOut(Screen)
-                        Game.start(Screen, 1)
+                        Game.start(Screen, Count + 1, SongImage_Index + 1)
                         Crashed = True
                     
                     if i == 1: # 왼쪽 버튼 클릭
-                        pass
+                        SongImage_Index -= 1
+
+                        if SongImage_Index < 0:
+                            SongImage_Index = 8
 
                     if i == 3: # 오른쪽 버튼 클릭
-                        pass
+                        SongImage_Index += 1
+
+                        if SongImage_Index >= SongImage_MAX:
+                            SongImage_Index = 0
 
         if not isButton:
             Screen.blit(Cursor[0], (Cursor_x, Cursor_y))
