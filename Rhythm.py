@@ -17,7 +17,7 @@ import pygame
 import random
 import sys
 
-def start(Screen, musicIndex = 1):
+def start(Screen, partIndex, musicIndex = 1):
     BLACK = (0, 0, 0)
     WHITE = (255, 255, 255)
     BLUE = (0, 199, 254)
@@ -34,33 +34,93 @@ def start(Screen, musicIndex = 1):
 
     ######################################################################
     # 포즈 관련
-    Standing = pygame.image.load('Rhythm/Upper_Pose/Standing.png').convert_alpha()
-    Standing = pygame.transform.scale(Standing, (int(Standing.get_rect().width / 1.5), int(Standing.get_rect().height / 1.5)))
+    standing = pygame.image.load('Rhythm/Upper_Pose/standing.png').convert_alpha()
+    standing = pygame.transform.scale(standing, (int(standing.get_rect().width / 1.5), int(standing.get_rect().height / 1.5)))
 
-    LFB_RAISE = pygame.image.load('Rhythm/Upper_Pose/LFB-RAISE.png').convert_alpha()
-    LFB_RAISE = pygame.transform.scale(LFB_RAISE, (int(LFB_RAISE.get_rect().width / 1.5), int(LFB_RAISE.get_rect().height / 1.5)))
+    if partIndex == 1:
+        # 상체
 
-    RFB_RAISE = pygame.image.load('Rhythm/Upper_Pose/RFB-RAISE.png').convert_alpha()
-    RFB_RAISE = pygame.transform.scale(RFB_RAISE, (int(RFB_RAISE.get_rect().width / 1.5), int(RFB_RAISE.get_rect().height / 1.5)))
+        lfb_raise = pygame.image.load('Rhythm/Upper_Pose/LFB-RAISE.png').convert_alpha()
+        lfb_raise = pygame.transform.scale(lfb_raise, (int(lfb_raise.get_rect().width / 1.5), int(lfb_raise.get_rect().height / 1.5)))
 
-    chestfly1 = pygame.image.load('Rhythm/Upper_Pose/chestfly1.png').convert_alpha()
-    chestfly1 = pygame.transform.scale(chestfly1, (int(chestfly1.get_rect().width / 1.5), int(chestfly1.get_rect().height / 1.5)))
+        rfb_raise = pygame.image.load('Rhythm/Upper_Pose/RFB-RAISE.png').convert_alpha()
+        rfb_raise = pygame.transform.scale(rfb_raise, (int(rfb_raise.get_rect().width / 1.5), int(rfb_raise.get_rect().height / 1.5)))
 
-    chestfly2 = pygame.image.load('Rhythm/Upper_Pose/chestfly2.png').convert_alpha()
-    chestfly2 = pygame.transform.scale(chestfly2, (int(chestfly2.get_rect().width / 1.5), int(chestfly2.get_rect().height / 1.5)))
+        chestfly1 = pygame.image.load('Rhythm/Upper_Pose/chestfly1.png').convert_alpha()
+        chestfly1 = pygame.transform.scale(chestfly1, (int(chestfly1.get_rect().width / 1.5), int(chestfly1.get_rect().height / 1.5)))
 
-    bigclap1 = pygame.image.load('Rhythm/Upper_Pose/bigclap1.png').convert_alpha()
-    bigclap1 = pygame.transform.scale(bigclap1, (int(bigclap1.get_rect().width / 1.5), int(bigclap1.get_rect().height / 1.5)))
+        chestfly2 = pygame.image.load('Rhythm/Upper_Pose/chestfly2.png').convert_alpha()
+        chestfly2 = pygame.transform.scale(chestfly2, (int(chestfly2.get_rect().width / 1.5), int(chestfly2.get_rect().height / 1.5)))
 
-    bigclap2 = pygame.image.load('Rhythm/Upper_Pose/bigclap2.png').convert_alpha()
-    bigclap2 = pygame.transform.scale(bigclap2, (int(bigclap2.get_rect().width / 1.5), int(bigclap2.get_rect().height / 1.5)))
+        bigclap1 = pygame.image.load('Rhythm/Upper_Pose/bigclap1.png').convert_alpha()
+        bigclap1 = pygame.transform.scale(bigclap1, (int(bigclap1.get_rect().width / 1.5), int(bigclap1.get_rect().height / 1.5)))
 
-    list_Node = [[RFB_RAISE, Standing],
-                 [LFB_RAISE, Standing],
-                 [chestfly1, chestfly2],
-                 [bigclap1, bigclap2]]
+        bigclap2 = pygame.image.load('Rhythm/Upper_Pose/bigclap2.png').convert_alpha()
+        bigclap2 = pygame.transform.scale(bigclap2, (int(bigclap2.get_rect().width / 1.5), int(bigclap2.get_rect().height / 1.5)))
 
-    MAX_POSE = 4
+        list_Node = [[standing, lfb_raise],
+                     [standing, rfb_raise],
+                     [chestfly1, chestfly2],
+                     [bigclap1, bigclap2]]
+        MAX_POSE = 4
+
+    if partIndex == 2:
+         # 하체
+
+        lfb_lunge = pygame.image.load('Rhythm/Lower_Pose/lfb_lunge.png').convert_alpha()
+        lfb_lunge = pygame.transform.scale(lfb_lunge, (int(lfb_lunge.get_rect().width / 1.5), int(lfb_lunge.get_rect().height / 1.5)))
+
+        rfb_lunge = pygame.image.load('Rhythm/Lower_Pose/rfb_lunge.png').convert_alpha()
+        rfb_lunge = pygame.transform.scale(rfb_lunge, (int(rfb_lunge.get_rect().width / 1.5), int(rfb_lunge.get_rect().height / 1.5)))
+
+        lfb_kneelift = pygame.image.load('Rhythm/Lower_Pose/lfb_kneelift.png').convert_alpha()
+        lfb_kneelift = pygame.transform.scale(lfb_kneelift, (int(lfb_kneelift.get_rect().width / 1.5), int(lfb_kneelift.get_rect().height / 1.5)))
+
+        rfb_kneelift = pygame.image.load('Rhythm/Lower_Pose/rfb_kneelift.png').convert_alpha()
+        rfb_kneelift = pygame.transform.scale(rfb_kneelift, (int(rfb_kneelift.get_rect().width / 1.5), int(rfb_kneelift.get_rect().height / 1.5)))
+
+        squat = pygame.image.load('Rhythm/Lower_Pose/squat.png').convert_alpha()
+        squat = pygame.transform.scale(squat, (int(squat.get_rect().width / 1.5), int(squat.get_rect().height / 1.5)))
+
+        list_Node = [[standing, lfb_lunge],
+                     [standing, rfb_lunge],
+                     [standing, lfb_kneelift],
+                     [standing, rfb_kneelift],
+                     [standing, squat]]
+        MAX_POSE = 5
+
+    if partIndex == 3:
+        # 전신
+        lfb_act1 = pygame.image.load('Rhythm/Body_Pose/lfb_act1.png').convert_alpha()
+        lfb_act1 = pygame.transform.scale(lfb_act1, (int(lfb_act1.get_rect().width / 1.5), int(lfb_act1.get_rect().height / 1.5)))
+
+        rfb_act1 = pygame.image.load('Rhythm/Body_Pose/rfb_act1.png').convert_alpha()
+        rfb_act1 = pygame.transform.scale(rfb_act1, (int(rfb_act1.get_rect().width / 1.5), int(rfb_act1.get_rect().height / 1.5)))
+
+        act3 = pygame.image.load('Rhythm/Body_Pose/act3.png').convert_alpha()
+        act3 = pygame.transform.scale(act3, (int(act3.get_rect().width / 1.5), int(act3.get_rect().height / 1.5)))
+
+        lfb_act4 = pygame.image.load('Rhythm/Body_Pose/lfb_act4.png').convert_alpha()
+        lfb_act4 = pygame.transform.scale(lfb_act4, (int(lfb_act4.get_rect().width / 1.5), int(lfb_act4.get_rect().height / 1.5)))
+
+        rfb_act4 = pygame.image.load('Rhythm/Body_Pose/rfb_act4.png').convert_alpha()
+        rfb_act4 = pygame.transform.scale(rfb_act4, (int(rfb_act4.get_rect().width / 1.5), int(rfb_act4.get_rect().height / 1.5)))
+
+        lfb_act7 = pygame.image.load('Rhythm/Body_Pose/lfb_act7.png').convert_alpha()
+        lfb_act7 = pygame.transform.scale(lfb_act7, (int(lfb_act7.get_rect().width / 1.5), int(lfb_act7.get_rect().height / 1.5)))
+
+        rfb_act7 = pygame.image.load('Rhythm/Body_Pose/rfb_act7.png').convert_alpha()
+        rfb_act7 = pygame.transform.scale(rfb_act7, (int(rfb_act7.get_rect().width / 1.5), int(rfb_act7.get_rect().height / 1.5)))
+
+        list_Node = [[standing, lfb_act1],
+                     [standing, rfb_act1],
+                     [standing, act3],
+                     [standing, lfb_act4],
+                     [standing, rfb_act4],
+                     [standing, lfb_act7],
+                     [standing, rfb_act7]]
+
+        MAX_POSE = 7
 
     Pose_Index = -1
     Node_Index = -1
@@ -87,7 +147,11 @@ def start(Screen, musicIndex = 1):
 
     def MakeNode(isLeft, Index1 = 0, Index2 = 0):
         NodeRect = list_Node[Index1][Index2].get_rect()
-        NodeRect.top = 150
+        if list_Node[Index1][Index2] == standing or partIndex == 1:
+                NodeRect.top = 150
+
+        else:
+            NodeRect.top = 200
 
         NodeRect.right = Screen_Width + list_Node[Index1][Index2].get_width()
         if isLeft:
@@ -434,9 +498,10 @@ def start(Screen, musicIndex = 1):
 
             elif GameOn == 0:  # 게임 온이 0이 되면
                 if PlayOn == 1:
-                        pygame.mixer.music.load("Rhythm/BGM/379240__westington__slot-machine.wav")
-                        pygame.mixer.music.play(-1)
-                        PlayOn -= 1
+                    Combo_FontSize = 0
+                    pygame.mixer.music.load("Rhythm/BGM/379240__westington__slot-machine.wav")
+                    pygame.mixer.music.play(-1)
+                    PlayOn -= 1
                         
                 Screen.blit(WhiteScreen, (391, 68))
                     # 밑에 코드가 다 룰렛
@@ -554,6 +619,7 @@ def start(Screen, musicIndex = 1):
         ######################################################################
             # 노드가 나오는 간격을 잡아주는 코드
             Elapsed_Time = (pygame.time.get_ticks() - Start_Ticks) / 1000
+            print(Elapsed_Time)
 
             if (SectionNum == 1):
                 if (Elapsed_Time < SongSection[0][0]):
@@ -564,7 +630,7 @@ def start(Screen, musicIndex = 1):
             elif (1 < SectionNum < len(SongSection) + 1):
                 if (SongSection[SectionNum - 2][0] < Elapsed_Time < SongSection[SectionNum - 1][0]):
                     Song_DelaySec = SongSection[SectionNum - 1][1]
-                elif (Elapsed_Time == SongSection[SectionNum - 1][0]):
+                elif (Elapsed_Time >= SongSection[SectionNum - 1][0]):
                     SectionNum += 1
                     #################################
 
