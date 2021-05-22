@@ -119,8 +119,8 @@ def FullBody():
                 if 140 <= dict_PoseAngle['LeftHip'] and 140 <= dict_PoseAngle['RightHip']:
                     if 40 <= dict_PoseAngle['RH-LH-LK'] <= 90 and 40 <= dict_PoseAngle['LH-RH-RK'] <= 90:
                         if dict_PoseLength['26, 25'] / dict_PoseLength['24, 23'] <= 1.5:
-                            print('Full-Body Motion 1-R')
-                            return 'Full-Body Motion 1-R'
+                            print('Full-Body Motion 1-L')
+                            return 'Full-Body Motion 1-L'
     # Full-Body Motion 1-L
     if dict_PoseAngle['RightElbow'] <= 125 and dict_PoseAngle['LeftElbow'] >= 150:
         if 60 <= dict_PoseAngle['LeftShoulder'] <= 120 and dict_PoseAngle['RightShoulder'] <= 50:
@@ -128,8 +128,8 @@ def FullBody():
                 if 140 <= dict_PoseAngle['LeftHip'] and 140 <= dict_PoseAngle['RightHip']:
                     if 40 <= dict_PoseAngle['LH-RH-RK'] <= 90 and 40 <= dict_PoseAngle['RH-LH-LK'] <= 90:
                         if dict_PoseLength['26, 25'] / dict_PoseLength['24, 23'] <= 1.5:
-                            print('Full-Body Motion 1-L')
-                            return 'Full-Body Motion 1-L'
+                            print('Full-Body Motion 1-R')
+                            return 'Full-Body Motion 1-R'
 
     # Full-Body Motion 2 (이범석, 최문형)
     if 150 <= dict_PoseAngle['LeftShoulder'] and 150 <= dict_PoseAngle['RightShoulder']:
@@ -168,28 +168,34 @@ def FullBody():
                         print('FBM 4-R')
                         return 'FBM 4-R'
 
-    # Full-Body Motion 5-R (이범석, 최문형)
+    # Full-Body Motion 5-R (이범석, 최문형) # 왼쪽 다리
     if dict_PoseLength['16, 15'] / dict_PoseLength['12, 11'] >= 3.5:
         if 96.0691 * 0.85 <= dict_PoseAngle['LW-RW-LA'] <= 96.0691 * 1.15 and dict_PoseAngle['RW-LW-RA'] <= 10:
             if dict_PoseAngle['LeftKnee'] >= 145 and dict_PoseAngle['RightKnee'] >= 145:
                 if dict_PoseLength['28, 27'] / dict_PoseLength['24, 23'] >= 3.5:
                     if dict_PoseAngle['LeftHip'] >= 130 and dict_PoseAngle['RightHip'] <= 90:
-                        print('FBM 5-R')
-                        return 'FBM 5-R'
+                        print('FBM 5-L')
+                        return 'FBM 5-L'
     # Full-Body Motion 5-L (이범석, 최문형)
     if dict_PoseLength['16, 15'] / dict_PoseLength['12, 11'] >= 3.5:
         if 75 <= dict_PoseAngle['RW-LW-RA'] <= 105 and dict_PoseAngle['LW-RW-LA'] <= 10:
             if dict_PoseAngle['LeftKnee'] >= 145 and dict_PoseAngle['RightKnee'] >= 145:
                 if dict_PoseLength['28, 27'] / dict_PoseLength['24, 23'] >= 3.5:
                     if dict_PoseAngle['RightHip'] >= 130 and dict_PoseAngle['LeftHip'] <= 90:
-                        print('FBM 5-L')
-                        return 'FBM 5-L'
+                        print('FBM 5-R')
+                        return 'FBM 5-R'
 
 
 # 리듬게임에 반환할 동작을 위해 동작 인식 모듈로 입력값을 넣어주는 함수 (최문형)
-def Func_GetUpperPose(frame, holistic):
+def Func_GetPose(frame, holistic, partIndex):
     pea.pose_estimation(frame, holistic, dict_PoseAngle, dict_PoseLength, dict_PoseLower)
-    return UpperBody()
+
+    if partIndex == 1:
+        return UpperBody()
+    if partIndex == 2:
+        return LowerBody()
+    if partIndex == 3:
+        return FullBody()
 
 
 # 리듬게임과 병합하기 전 사용되었던 main 함수 (최문형)
