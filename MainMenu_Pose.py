@@ -41,7 +41,7 @@ def Func_Separation(Screen, Count, Cursor):
     Back_Button = pygame.Rect(36 - 53, 48 - 63, 85, 88)
     Left_Button = pygame.Rect(158 - 53, 254 - 63, 135, 88)
     Middle_Button = pygame.Rect(541 - 53, 152 - 63, 300, 310)
-    Right_Button = pygame.Rect(1036 - 53, 224 - 63, 135, 88)
+    Right_Button = pygame.Rect(1036 - 53, 254 - 63, 135, 88)
     BUTTON = [Back_Button, Left_Button, Middle_Button, Right_Button]
 
     ############################################################
@@ -247,66 +247,67 @@ def Func_Separation(Screen, Count, Cursor):
         Cursor_x = Cursor_x - (Cursor[0].get_width() / 2)
         Cursor_y = Cursor_y - (Cursor[1].get_height() / 2)
 
-        for i in range(len(BUTTON)):
-            if BUTTON[i].collidepoint((Cursor_x, Cursor_y)):
-                if i == 2:
-                    Screen.blit(SongImage[SongImage_Index][1], SongImage_Position)
+        if OpacityLevel >= 250:
+            for i in range(len(BUTTON)):
+                if BUTTON[i].collidepoint((Cursor_x, Cursor_y)):
+                    if i == 2:
+                        Screen.blit(SongImage[SongImage_Index][1], SongImage_Position)
 
-                Screen.blit(Cursor[1], (Cursor_x, Cursor_y))
-                isButton = True
+                    Screen.blit(Cursor[1], (Cursor_x, Cursor_y))
+                    isButton = True
 
-                if Click:
-                    if i == 0: # 뒤로가기 버튼 클릭
-                        while True:
-                            pygame.time.Clock().tick(30)
+                    if Click:
+                        if i == 0: # 뒤로가기 버튼 클릭
+                            while True:
+                                pygame.time.Clock().tick(30)
 
-                            Screen.blit(BackScreen, (0, 0))
+                                Screen.blit(BackScreen, (0, 0))
 
-                            # 요소들 fade out 시키기
-                            DownBlue.set_alpha(OpacityLevel)
-                            Screen.blit(DownBlue, (DB_Level_1_x, DB_Level_1_y))
-                            UpBlue.set_alpha(OpacityLevel)
-                            Screen.blit(UpBlue, (UB_Level_1_x, UB_Level_1_y))
-                            Crowd.set_alpha(OpacityLevel)
-                            Screen.blit(Crowd, (Crowd_Level_1_x, Crowd_Level_1_y))
-                            SongBlock.set_alpha(OpacityLevel)
-                            Screen.blit(SongBlock, (SB_x, SB_y))
-                            Prev.set_alpha(OpacityLevel)
-                            Screen.blit(Prev, (Prev_x, Prev_y))
-                            Next.set_alpha(OpacityLevel)
-                            Screen.blit(Next, (Next_x, Next_y))
-                            Exit.set_alpha(OpacityLevel)
-                            Screen.blit(Exit, (Exit_x, Exit_y))
-                            SongImage[SongImage_Index][0].set_alpha(OpacityLevel)
-                            Screen.blit(SongImage[SongImage_Index][0], (521, 120))
+                                # 요소들 fade out 시키기
+                                DownBlue.set_alpha(OpacityLevel)
+                                Screen.blit(DownBlue, (DB_Level_1_x, DB_Level_1_y))
+                                UpBlue.set_alpha(OpacityLevel)
+                                Screen.blit(UpBlue, (UB_Level_1_x, UB_Level_1_y))
+                                Crowd.set_alpha(OpacityLevel)
+                                Screen.blit(Crowd, (Crowd_Level_1_x, Crowd_Level_1_y))
+                                SongBlock.set_alpha(OpacityLevel)
+                                Screen.blit(SongBlock, (SB_x, SB_y))
+                                Prev.set_alpha(OpacityLevel)
+                                Screen.blit(Prev, (Prev_x, Prev_y))
+                                Next.set_alpha(OpacityLevel)
+                                Screen.blit(Next, (Next_x, Next_y))
+                                Exit.set_alpha(OpacityLevel)
+                                Screen.blit(Exit, (Exit_x, Exit_y))
+                                SongImage[SongImage_Index][0].set_alpha(OpacityLevel)
+                                Screen.blit(SongImage[SongImage_Index][0], SongImage_Position)
 
-                            if OpacityLevel > 0:
-                                OpacityLevel -= 18.5
+                                if OpacityLevel > 0:
+                                    OpacityLevel -= 18.5
 
-                            else:
-                                break
+                                else:
+                                    break
 
-                            pygame.display.update()
+                                pygame.display.update()
 
-                        #MainMenu_Pose 종료
-                        Crashed = True
+                            #MainMenu_Pose 종료
+                            Crashed = True
 
-                    if i == 2: # 가운데 클릭
-                        Func_FadeOut(Screen)
-                        Game.start(Screen, Count + 1, SongImage_Index + 1)
-                        Crashed = True
-                    
-                    if i == 1: # 왼쪽 버튼 클릭
-                        SongImage_Index -= 1
+                        if i == 2: # 가운데 클릭
+                            Func_FadeOut(Screen)
+                            Game.start(Screen, Count + 1, SongImage_Index + 1)
+                            Crashed = True
 
-                        if SongImage_Index < 0:
-                            SongImage_Index = 8
+                        if i == 1: # 왼쪽 버튼 클릭
+                            SongImage_Index -= 1
 
-                    if i == 3: # 오른쪽 버튼 클릭
-                        SongImage_Index += 1
+                            if SongImage_Index < 0:
+                                SongImage_Index = 8
 
-                        if SongImage_Index >= SongImage_MAX:
-                            SongImage_Index = 0
+                        if i == 3: # 오른쪽 버튼 클릭
+                            SongImage_Index += 1
+
+                            if SongImage_Index >= SongImage_MAX:
+                                SongImage_Index = 0
 
         if not isButton:
             Screen.blit(Cursor[0], (Cursor_x, Cursor_y))
