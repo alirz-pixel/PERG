@@ -6,9 +6,11 @@
 2021-05-15  14:48  combo 시스템 구현 - 김창현
 2021-05-17  02:23  동작인식 이미지 추가와 동작인식을 할 수 있도록 코드 추가 - 최문형
 2021-05-17  10:23  도전과제 출력 시스템 병합 - 최문형
-2021-05-17  21:05  도전과제 출력 타이밍 개선 - 김창현 
+2021-05-17  21:05  도전과제 출력 타이밍 개선 - 김창현
+2021-05-22  09:24  게임 내 변수 시스템 추가 - 김창현
+2021-05-22  10:31  게임 내 변수 시스템 및 게임 종료 시 이펙트 병합 - 최문형
 '''
-
+################################### 모듈 ######################################
 import GetPose as GP
 import mediapipe as mp
 import SongLoad as SL
@@ -16,8 +18,21 @@ import cv2 as cv
 import pygame
 import random
 import sys
+###############################################################################
 
-def start(Screen, partIndex, musicIndex = 1):
+######################### 게임 기본 설정 - 최문형 ################################
+
+def start(Screen, partIndex, musicIndex = 1): # 자주 사용할 색깔 정의
+                                              # 화면 크기 설정
+                                              # 노드 이미지 불러오기
+    # 화면 크기
+    Screen_Width = 1280  # 가로 크기
+    Screen_Height = 720  # 세로 크기
+
+    # FPS
+    Clock = pygame.time.Clock()
+
+    # 자주 사용할 색깔 정리
     BLACK = (0, 0, 0)
     WHITE = (255, 255, 255)
     BLUE = (0, 199, 254)
@@ -27,19 +42,12 @@ def start(Screen, partIndex, musicIndex = 1):
     COLORS = [BLUE, GREEN, PINK]
 
 
-    ######################################################################
-    # 화면 크기
-    Screen_Width = 1280  # 가로 크기
-    Screen_Height = 720  # 세로 크기
+    # 노드 이미지 불러오기
 
-    ######################################################################
-    # 포즈 관련
     standing = pygame.image.load('Rhythm/Upper_Pose/standing.png').convert_alpha()
     standing = pygame.transform.scale(standing, (int(standing.get_rect().width / 1.5), int(standing.get_rect().height / 1.5)))
 
-    if partIndex == 1:
-        # 상체 (최문형)
-
+    if partIndex == 1: # 상체 (최문형)
         lfb_raise = pygame.image.load('Rhythm/Upper_Pose/lfb_raise.png').convert_alpha()
         lfb_raise = pygame.transform.scale(lfb_raise, (int(lfb_raise.get_rect().width / 1.5), int(lfb_raise.get_rect().height / 1.5)))
 
@@ -64,9 +72,7 @@ def start(Screen, partIndex, musicIndex = 1):
                      [bigclap1, bigclap2]]
         MAX_POSE = 4
 
-    if partIndex == 2:
-         # 하체 (김창현, 최문형)
-
+    if partIndex == 2: # 하체 (김창현, 최문형)
         lfb_lunge = pygame.image.load('Rhythm/Lower_Pose/lfb_lunge.png').convert_alpha()
         lfb_lunge = pygame.transform.scale(lfb_lunge, (int(lfb_lunge.get_rect().width / 1.5), int(lfb_lunge.get_rect().height / 1.5)))
 
@@ -89,8 +95,7 @@ def start(Screen, partIndex, musicIndex = 1):
                      [squat, standing]]
         MAX_POSE = 5
 
-    if partIndex == 3:
-        # 전신 (김창현, 최문형)
+    if partIndex == 3: # 전신 (김창현, 최문형)
         rfb_act1 = pygame.image.load('Rhythm/Body_Pose/rfb_act1.png').convert_alpha()
         rfb_act1 = pygame.transform.scale(rfb_act1, (int(rfb_act1.get_rect().width / 1.5), int(rfb_act1.get_rect().height / 1.5)))
 
@@ -128,8 +133,41 @@ def start(Screen, partIndex, musicIndex = 1):
 
     Pose_Index = -1
     Node_Index = -1
-    ######################################################################
-    # copyright : 최문형
+
+    # 스페셜 노드 관련 (김창현)
+    warning = pygame.image.load("Rhythm/SpecialNode/warning.png")
+    warning_width = int(warning.get_rect().width / 1.5)
+    warning_height = int(warning.get_rect().height / 1.5)
+    warning = pygame.transform.scale(warning, (warning_width, warning_height))
+
+    warningBGM = pygame.mixer.Sound("Rhythm/BGM/ビープ音.mp3")
+    warningBGM_On = 0
+
+    Bomb = pygame.image.load("Rhythm/SpecialNode/BombEffect.png")
+    Bomb = pygame.transform.scale(Bomb, (int(Bomb.get_width() * 3 / 2), int(Bomb.get_height() * 3 / 2)))
+
+    BombBGM = pygame.mixer.Sound("Rhythm/BGM/大砲2.mp3")
+    BombBGM_On = 0
+    BombOn = 0
+    # 노드 변수
+    queue_Node = []  # 화면에 나온 노드들을 담는 배열 -> 자료구조의 queue 이용
+    queue_special_Node = []
+
+    SpecialPose_Index = -1
+    SpecialNode_Index = -1
+    SpecialCount = 0
+
+    S_a = 30
+    GoalPoint = 0
+
+    # 리듬게임의 노드 관련
+    PlusScore = 0  # 사용자가 얼마나 맞췄는지 판단하는 변수
+    NodeCount = 0  # 현재 까지 나온 노드의 수를 담는 변수
+    Percentage = 100  # 정확도를 화면에 출력하기 위한 변수
+##############################################################################
+
+
+############################## 포즈 비교 - 최문형 ##############################
     def Func_UpperSame(GetPose, Index1, Index2):
         if (Index1 == 0 or Index1 == 1) and Index2 == 1 and GetPose == 'standing':
             return True
@@ -185,8 +223,10 @@ def start(Screen, partIndex, musicIndex = 1):
             return True
 
         return False
-    ######################################################################
+##############################################################################
 
+
+############################# 노드 생성 - 최문형 ###############################
     def MakeNode(isLeft, Index1 = 0, Index2 = 0):
         NodeRect = list_Node[Index1][Index2].get_rect()
         if list_Node[Index1][Index2] == standing or partIndex == 1:
@@ -200,8 +240,20 @@ def start(Screen, partIndex, musicIndex = 1):
             NodeRect.left = 0 - list_Node[Index1][Index2].get_width()
 
         return [list_Node[Index1][Index2], NodeRect, isLeft, Index1, Index2]
+##############################################################################
 
 
+########################### 스페셜 노드 생성 - 김창현 ############################
+    def Func_MakeSpecialNode(Seconds, Index1 = 0, Index2 = 0):
+        NodeRect = list_Node[Index1][Index2].get_rect(center=(list_Node[Index1][Index2].get_width() / 2, list_Node[Index1][Index2].get_height() / 2))
+        NodeRect.left = (Screen_Width / 2) - (list_Node[Index1][Index2].get_width() / 2 )
+        NodeRect.top = 720
+
+        return [list_Node[Index1][Index2], NodeRect, Seconds, Index1, Index2]
+##############################################################################
+
+
+######################### 배경 화면 색상 전환 - 최문형 ###########################
     def Func_ChangeBackground(Color):
         # Bg == Blue
         BgColor[3] += 1
@@ -234,17 +286,20 @@ def start(Screen, partIndex, musicIndex = 1):
             return 0
 
         return 1
+##############################################################################
 
+
+########################## 동작 인식 기본 셋팅  - 최문형 #########################
     # OpenCV 기본 초기화
     cap = cv.VideoCapture(0)
 
     # 동작 인식을 위한 변수
     Motion_Delay = 125
     Motion_Time = 0
-    ######################################################################
-    # FPS
-    Clock = pygame.time.Clock()
-    ######################################################################
+##############################################################################
+
+
+########################### 배경 화면 기본 설정 - 최문형 #########################
     # 배경 색상 관련 변수 및 상수
     Background_Delay = 3000
     Background_Time = 0
@@ -276,9 +331,10 @@ def start(Screen, partIndex, musicIndex = 1):
 
     WhiteScreen = pygame.image.load("Rhythm/Screen/WhiteScreen.png")
     WhiteScreen = pygame.transform.scale(WhiteScreen, (478, 771))
-    
+##############################################################################
 
-    ######################################################################
+
+########################### 도전과제 설정 - 김창현 ##############################
     # 도전과제 이미지 불러오기
 
     # 시작이 반이다
@@ -288,6 +344,7 @@ def start(Screen, partIndex, musicIndex = 1):
     achievement1_Width = achievement1_Size[0]  # 이미지의 너비
     achievement1_Height = achievement1_Size[1]  # 이미지의 높이
     achievement1 = pygame.transform.scale(achievement1, (int(achievement1_Width / 1.5), int(achievement1_Height / 1.5)))
+
 
     # 의지박약
     # 정확도 0%로 게임을 끝마침
@@ -332,70 +389,60 @@ def start(Screen, partIndex, musicIndex = 1):
                         [achievement5, achievement5_Width, 871],
                         [achievement6, achievement6_Width, 871],
                         [achievement7, achievement7_Width, 871]]
-    
-    #도전과제 변수
-    # 짜쟌 효과음
-    Tada = pygame.mixer.Sound("Rhythm/BGM/ジャジャーン.mp3")
+
+    # 도전과제 배경음악 및 효과음 설정
+    TadaBGM = pygame.mixer.Sound("Rhythm/BGM/ジャジャーン.mp3")
     NodeBGM = pygame.mixer.Sound("Rhythm/BGM/決定、ボタン押下2.mp3")
-    count = 1  # 룰렛 돈 횟수
+
+    # 도전과제 변수
+    R_Count = 1  # 룰렛 돈 횟수
     PlayOn = 0  # 배경음악이 켜져있는 확인하는 척도
-    a = 0  # 룰렛의 가속도
+    R_a = 0  # 룰렛의 가속도
 
-    index = 0
-    c_index = 2  # 도전과제 달성 인덱스
-    ##########################################################################################
-    # 배경음악
-    SectionNum = 1
-    Song_Time = 0
+    Index = 0
+    C_Index = 2  # 도전과제 달성 인덱스
+##############################################################################
 
-    music, SongSection, SongName, SongTime = SL.LoadSong(musicIndex)
-    ######################################################################
+
+###################### 리듬 게임 음악 설정 (김수영, 최문형) #######################
+    # 배경음악 및 효과음
+    SectionNum = 1 # 구역 인덱스
+    Song_Time = 0 # not same as SongTime
+
+    music, SongSection, SongName, SpecialTiming, SongTime = SL.LoadSong(musicIndex) # 노래 정보 가져오기
+##############################################################################
+
+
     # 시간 계산
     Start_Ticks = pygame.time.get_ticks()
-    ######################################################################
+
+############################## 폰트 객체 설정 ##################################
     Timer_Font = pygame.font.Font("Rhythm/Font/CookieRun Regular.ttf", 30) # 폰트 객체 생성(폰트, 크기)
     Music_Font = pygame.font.Font("Rhythm/Font/CookieRun Bold.ttf", 40)
     Percentage_Font = pygame.font.Font("Rhythm/Font/CookieRun Bold.ttf", 40)
-    ######################################################################
-    # 리듬게임의 노드 관련
-    PlusScore = 0    # 사용자가 얼마나 맞췄는지 판단하는 변수
-    NodeCount = 0    # 현재 까지 나온 노드의 수를 담는 변수
-    Percentage = 100 # 정확도를 화면에 출력하기 위한 변수
-    queue_Node = []  # 화면에 나온 노드들을 담는 배열 -> 자료구조의 queue 이용
+##############################################################################
 
+
+############################## 콤보 설정 - 김창현 ###############################
     # 콤보 관련
     Combo_FontSize = 0
     ComboNum = 0
     ComboMax = 0
+###############################################################################
 
-    x = 1
+
+################################# 게임 시작 ####################################
     Crashed = False
-    ######################################################################
     with mp.solutions.holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
         while not Crashed:
-            Elapsed_Time = (pygame.time.get_ticks() - Start_Ticks) / 1000
+
+    ################################ 게임 이벤트 ###################################
             for event in pygame.event.get(): # 어떤 이벤트가 발생하였는가?
                 if event.type == pygame.QUIT: # 창이 닫히는 이벤트가 발생하였는가?
                     Crashed = True
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    #print(pygame.mouse.get_pos())
-                    
-                    if Pose_Index == -1:
-                        Pose_Index = random.randrange(0, MAX_POSE)
-                        Node_Index = 0
-
-                    # 왼쪽 노드 추가하기
-                    if random.randrange(0, 2):
-                        queue_Node.append(MakeNode(1, Pose_Index, Node_Index))
-
-                    # 오른쪽 노드 추가하기
-                    else:
-                        queue_Node.append(MakeNode(0, Pose_Index, Node_Index))
-
-                    Node_Index += 1
-                    if Node_Index == 2:
-                        Pose_Index = -1
+                    pass
 
                 if event.type == pygame.KEYDOWN:  # 키가 눌렸는지 확인
                     if event.key == pygame.K_DOWN:  # 아래 방향키
@@ -427,8 +474,22 @@ def start(Screen, partIndex, musicIndex = 1):
                                         Percentage = round(PlusScore / NodeCount * 100)  # 정확도
                         except:
                             pass
+                    if event.key == pygame.K_LEFT: # 위쪽 방향키
+                        try:
+                            queue_special_Node.pop(0)
+                            print("Yes!")
+                            Combo_FontSize = 60
+                            PlusScore += 1
+                            ComboNum += 1
 
-        ######################################################################
+                            if NodeCount != 0:
+                                Percentage = round(PlusScore / NodeCount * 100)  # 정확도
+                        except:
+                            pass
+    ##############################################################################
+
+
+    ########################### 화면 색상 전환 - 최문형 ##############################
             # 화면 색깔 변환
             Now_Time = pygame.time.get_ticks()
             if (Now_Time > Background_Time + Background_Delay):
@@ -442,6 +503,7 @@ def start(Screen, partIndex, musicIndex = 1):
                 Background_Change = Func_ChangeBackground(Background_Color)
 
             Screen.fill((BgColor[0], BgColor[1], BgColor[2]))
+
             # 그림자 생성
             ShadowRect.set_alpha(70)
             Screen.blit(ShadowRect, (0, 107))
@@ -452,9 +514,10 @@ def start(Screen, partIndex, musicIndex = 1):
             Screen.blit(ShadowRect, (0, 102))
             Screen.blit(Background_Laft, (0, 112))
             Screen.blit(Background_Right, (870, 112))
+    ##############################################################################
 
 
-        ######################################################################
+    ####################### 노드 움직이기 / 나타내기 - 최문형 #########################
             if PlayOn == 1:
                 # 노드를 중앙으로 움직이기
                 for i in range(len(queue_Node)):
@@ -469,8 +532,10 @@ def start(Screen, partIndex, musicIndex = 1):
                 # 노드를 화면에 출력하기
                 for temp, tempRect, _, _, _ in queue_Node:
                     Screen.blit(temp, tempRect)
+    ##############################################################################
 
-        ######################################################################
+
+    ################ 노래가 끝났을 / 끝났지 않았을 경우 - 김창현 / 최문형 ################
             # 배경음악
             if PlayOn == 0 and GameOn == 1:
                 pygame.mixer.music.load(music)
@@ -483,7 +548,10 @@ def start(Screen, partIndex, musicIndex = 1):
                 Elapsed_Time = (pygame.time.get_ticks() - Start_Ticks) / 1000
                 if (Elapsed_Time > SongTime + 10):
                     GameOn = 0
+    ##############################################################################
 
+
+    #################### 노래가 끝나지 않았을 경우 모션인식 - 최문형 ###################
             if GameOn == 1:
                 # 사용자 캠 불러오기
                 _, frame = cap.read()
@@ -509,10 +577,9 @@ def start(Screen, partIndex, musicIndex = 1):
 
                         # 노드의 타이밍에 맞게 동작을 취했는지 확인하는 코드
                         if Bool_Same:
-                            if queue_Node[0][2] == 0:  # 오른쪽에서 노드가 나옸다면
+                            if queue_Node[0][2] == 0:  # 오른쪽에서 노드가 나왔다면
                                 if 895 in range(queue_Node[0][1].left, queue_Node[0][1].left + queue_Node[0][1].width):
                                     queue_Node.pop(0)
-                                    print("Right_Yes!")
                                     Combo_FontSize = 60
                                     PlusScore += 1
                                     ComboNum += 1
@@ -520,10 +587,9 @@ def start(Screen, partIndex, musicIndex = 1):
                                     if NodeCount != 0:
                                         Percentage = round(PlusScore / NodeCount * 100)  # 정확도
 
-                            if queue_Node[0][2] == 1:  # 왼쪽에서 노드가 나옸다면
+                            if queue_Node[0][2] == 1:  # 왼쪽에서 노드가 나왔다면
                                 if 372 in range(queue_Node[0][1].left, queue_Node[0][1].left + queue_Node[0][1].width):
                                     queue_Node.pop(0)
-                                    print("Left_Yes!")
                                     Combo_FontSize = 60
                                     PlusScore += 1
                                     ComboNum += 1
@@ -542,7 +608,10 @@ def start(Screen, partIndex, musicIndex = 1):
                 py_Frame = pygame.transform.scale(py_Frame, (478, 690))
                 Screen.blit(py_Frame, (399, 111))
                 Screen.blit(Background_Middle, (363, 43))
+    ##############################################################################
 
+
+    ######################## 노래가 끝났을 경우 - 김창현 #############################
             elif GameOn == 0:  # 게임 온이 0이 되면
                 if PlayOn == 1:
                     Combo_FontSize = 0
@@ -552,58 +621,61 @@ def start(Screen, partIndex, musicIndex = 1):
                         
                 Screen.blit(WhiteScreen, (391, 68))
                     # 밑에 코드가 다 룰렛
-                if count < 4:
-                    if count == 0:
-                        if a < 50:
-                            a += 1
+                if R_Count < 4:
+                    if R_Count == 0:
+                        if R_a < 50:
+                            R_a += 1
     
-                    elif count == 1:
-                        if a < 100:
-                            a += 1
+                    elif R_Count == 1:
+                        if R_a < 100:
+                            R_a += 1
     
-                    elif count == 2:
-                        if a > 50:
-                            a -= 1
-                    elif count == 3:
-                        if a > 25:
-                            a -= 1
+                    elif R_Count == 2:
+                        if R_a > 50:
+                            R_a -= 1
+                    elif R_Count == 3:
+                        if R_a > 25:
+                            R_a -= 1
     
-                    if count < 3:
-                        if index <= 6:
-                            Screen.blit(list_Achievement[index][0], (list_Achievement[index][2], 100))
+                    if R_Count < 3:
+                        if Index <= 6:
+                            Screen.blit(list_Achievement[Index][0], (list_Achievement[Index][2], 100))
     
-                            if list_Achievement[index][2] > 403 - list_Achievement[index][1]:
-                                list_Achievement[index][2] -= a
+                            if list_Achievement[Index][2] > 403 - list_Achievement[Index][1]:
+                                list_Achievement[Index][2] -= R_a
                             else:
-                                list_Achievement[index][2] = 871
-                                index += 1
-                                if index == 7:
-                                    index = 0
-                                    count += 1
+                                list_Achievement[Index][2] = 871
+                                Index += 1
+                                if Index == 7:
+                                    Index = 0
+                                    R_Count += 1
                     else:
-                        if index <= c_index:
-                            Screen.blit(list_Achievement[index][0], (list_Achievement[index][2], 100))
+                        if Index <= C_Index:
+                            Screen.blit(list_Achievement[Index][0], (list_Achievement[Index][2], 100))
     
-                            if index < c_index:
+                            if Index < C_Index:
     
-                                if list_Achievement[index][2] > 403 - list_Achievement[index][1]:
-                                    list_Achievement[index][2] -= a
+                                if list_Achievement[Index][2] > 403 - list_Achievement[Index][1]:
+                                    list_Achievement[Index][2] -= R_a
                                 else:
-                                    index += 1
+                                    Index += 1
                             else:
-                                if list_Achievement[index][2] > 403:
-                                    list_Achievement[index][2] -= a
+                                if list_Achievement[Index][2] > 403:
+                                    list_Achievement[Index][2] -= R_a
                                 else:
-                                    if pygame.mixer.music.get_busy():  # like this!
+                                    if pygame.mixer.music.get_busy():
                                         pygame.mixer.music.stop()
-                                        Tada.play()
-                                        count += 1
+                                        TadaBGM.play()
+                                        R_Count += 1
 
-                Screen.blit(list_Achievement[c_index][0], (list_Achievement[c_index][2], 100))
+                Screen.blit(list_Achievement[C_Index][0], (list_Achievement[C_Index][2], 100))
                 Screen.blit(Background_Laft, (0, 112))
                 Screen.blit(Background_Right, (870, 112))
                 Screen.blit(Background_Middle, (363, 43))
-        ######################################################################
+    #############################################################################
+
+
+    ######################### 노드 제거 및 콤보 축적 - 최문형 ########################
             for temp, tempRect, isLeft, _, _ in queue_Node:
                 # 왼쪽 노드라면
                 if isLeft:
@@ -630,7 +702,38 @@ def start(Screen, partIndex, musicIndex = 1):
                             ComboMax = ComboNum
                         Combo_FontSize = 0
                         ComboNum = 0
-        ######################################################################
+    ##############################################################################
+
+
+    ########################## 스페셜 노드 소멸 - 김창현 #############################
+            for i in range(0, len(queue_special_Node)):
+                Elapsed_Time = (pygame.time.get_ticks() - Start_Ticks) / 1000
+
+                if SpecialTiming[SpecialCount - 1] <= int(Elapsed_Time) < SpecialTiming[SpecialCount - 1] + 10:
+
+                    queue_special_Node[i][0] = pygame.transform.scale(queue_special_Node[i][0], (queue_special_Node[i][0].get_width() + 5, queue_special_Node[i][0].get_height() + 5))
+                    Screen.blit(queue_special_Node[i][0], (Screen_Width / 2 - queue_special_Node[i][0].get_width() / 2, Screen_Height / 2 - queue_special_Node[i][0].get_height() / 2))
+
+                if SpecialTiming[SpecialCount - 1] + 10 <= int(Elapsed_Time) <= SpecialTiming[SpecialCount - 1] + 13:
+                    if BombBGM_On == 0:
+                        BombBGM.play()
+                        queue_special_Node.pop(0)
+
+                        if NodeCount != 0:
+                            Percentage = round(PlusScore / NodeCount * 100)  # 정확도
+
+                        # 콤보가 끊겼을 때, Max콤보를 업데이트하는 코드
+                        if ComboMax < ComboNum:
+                            ComboMax = ComboNum
+                            Combo_FontSize = 0
+                            ComboNum = 0
+
+                        BombBGM_On += 1
+                        Screen.blit(Bomb, (Screen_Width / 2 - Bomb.get_width() / 2, Screen_Height / 2 - Bomb.get_height() / 2))
+    ##############################################################################
+
+
+    ########################### 타이머 및 인터페이스- 김창현 #########################
             # 경과 시간(ms)을 1000으로 나누어서 초(s) 단위로 표시
             Elapsed_Time = (pygame.time.get_ticks() - Start_Ticks) / 1000
             # 출력할 글자, True, 글자 색상
@@ -652,18 +755,21 @@ def start(Screen, partIndex, musicIndex = 1):
             Screen.blit(ScoreNum, (1160, 45))
 
             # 콤보수가 1이상일 경우, 화면에 나오게하는 코드
-            if ComboNum >= 1:  # 콤보가 1 이상일 경우
-                if (Combo_FontSize != 100):  # 폰트 크기 설정
-                    Combo_FontSize += 20
-                ComboNum_Font = pygame.font.Font("Rhythm/Font/CookieRun Black.ttf", Combo_FontSize)
-                Combo = ComboNum_Font.render(str(ComboNum) + " COMBO", True, WHITE)
-                ComboRect = Combo.get_rect(center=(Screen_Width / 2, Screen_Height / 2 + 300))  # 콤보 폰트의 센터 설정
-                Screen.blit(Combo, ComboRect)
+            if GameOn == 1:
+                if ComboNum >= 1:  # 콤보가 1 이상일 경우
+                    if (Combo_FontSize != 100):  # 폰트 크기 설정
+                        Combo_FontSize += 20
+                    ComboNum_Font = pygame.font.Font("Rhythm/Font/CookieRun Black.ttf", Combo_FontSize)
+                    Combo = ComboNum_Font.render(str(ComboNum) + " COMBO", True, WHITE)
+                    ComboRect = Combo.get_rect(center=(Screen_Width / 2, Screen_Height / 2 + 300))  # 콤보 폰트의 센터 설정
+                    Screen.blit(Combo, ComboRect)
 
             pygame.draw.rect(Screen, (0, 0, 0), [12, 10, 1256, 25], 3) # 타이머바 틀
             pygame.draw.rect(Screen, (255, 255, 255), [15, 13, Elapsed_Time * 7.70, 19]) # 타이머바
+    ######################################################################
 
-        ######################################################################
+
+    ######################### 노드 타이밍 설정 - 김창현 #############################
             # 노드가 나오는 간격을 잡아주는 코드
             Elapsed_Time = (pygame.time.get_ticks() - Start_Ticks) / 1000
 
@@ -678,19 +784,22 @@ def start(Screen, partIndex, musicIndex = 1):
                     Song_DelaySec = SongSection[SectionNum - 1][1]
                 elif (Elapsed_Time >= SongSection[SectionNum - 1][0]):
                     SectionNum += 1
-                    #################################
+    ##############################################################################
 
+
+    ############################ 일반 노드 추가 - 김창현 ###########################
                 # 그 간격에 따라서 노드가 나오도록 설정
                 if PlayOn == 1 and NodeOn == 1:
                     Now_Time = pygame.time.get_ticks()
                     if (Now_Time > Song_Time + Song_DelaySec):
                         Song_Time = Now_Time
-                        ###################### 노드 추가 ##########################
+
                         if Pose_Index == -1:
                             Pose_Index = random.randrange(0, MAX_POSE)
                             Node_Index = 0
     
                         NodeCount += 1 # 노드가 추가되었으니 현재까지 나온 노드 수를 1 더해준다.
+
                         # 왼쪽 노드 추가하기
                         if random.randrange(0, 2):
                             queue_Node.append(MakeNode(1, Pose_Index, Node_Index))
@@ -704,8 +813,59 @@ def start(Screen, partIndex, musicIndex = 1):
                         Node_Index += 1
                         if Node_Index == 2:
                             Pose_Index = -1
+    ##############################################################################
 
 
+    ########################### 특별 노드 추가  - 김창현 ############################
+                Elapsed_Time = (pygame.time.get_ticks() - Start_Ticks) / 1000
+
+
+                if SpecialCount < len(SpecialTiming):
+                    if SpecialTiming[SpecialCount] - 3 <= int(Elapsed_Time) < SpecialTiming[SpecialCount]:
+                        if warningBGM_On == 0:
+                            warningBGM.play()
+                            warningBGM_On += 1
+                        Screen.blit(warning, (Screen_Width / 2 - warning.get_rect().width / 2, 480))
+
+                    if int(Elapsed_Time) == SpecialTiming[SpecialCount]:
+                        if SpecialPose_Index == -1:
+                            SpecialPose_Index = random.randrange(0, MAX_POSE)
+                            SpecialNode_Index = random.randrange(0, 2)
+
+                        queue_special_Node.append(Func_MakeSpecialNode(SpecialTiming[SpecialCount], SpecialPose_Index, SpecialNode_Index))
+                        NodeCount += 1
+                        NodeBGM.play()
+
+                        SpecialNode_Index += 1
+                        if SpecialNode_Index == 2:
+                            SpecialPose_Index = -1
+
+                        SpecialCount += 1
+    ##############################################################################
+
+
+    ######################## 특별 노드 이동과 나타내기 - 김창현 #######################
+                if PlayOn == 1:
+                    if SpecialCount <= len(SpecialTiming):
+
+                        if S_a < 120:
+                            S_a += 5
+
+                        # 노드를 중앙으로 움직이기
+                        for i in range(len(queue_special_Node)):
+                            if queue_special_Node[i][1].top > Screen_Height / 2 - queue_special_Node[i][0].get_height() / 2:
+                                queue_special_Node[i][1].top -= S_a
+                            else:
+                                S_a = 30
+                                BombOn += 1
+
+                        if Elapsed_Time <= SpecialTiming[SpecialCount - 1]:
+                            for temp, tempRect, _, _, _ in queue_special_Node:
+                                Screen.blit(temp, tempRect)
+    ##############################################################################
+
+
+    ########################## 페이드 인과 마무리 등 - 최문형 ########################
             # fade in
             FadeIn.set_alpha(OpacityLevel)
             Screen.blit(FadeIn, (0, 0))
@@ -721,3 +881,4 @@ def start(Screen, partIndex, musicIndex = 1):
         cap.release()
         cv.destroyAllWindows()
         pygame.mixer.music.stop()
+##############################################################################
