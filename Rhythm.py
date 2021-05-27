@@ -1,5 +1,5 @@
 '''
-2021-05-08  16:21  리듬게임 도중에 치어리더와 같은 effect 나오는 소스코드 작성 - 김수영 (아직 병합되지 않음)
+2021-05-08  16:21  리듬게임 도중에 치어리더와 같은 effect 나오는 소스코드 작성 - 김수영
 2021-05-13  14:41  Rhythm.py 모듈화 (소스코드 분할) - 최문형
 2021-05-15  11:32  정확도 계산 코드 작성 - 김창현
 2021-05-15  11:57  노드 타이밍 및 음악 가져오는 소스코드 병합 - 최문형
@@ -7,6 +7,7 @@
 2021-05-17  02:23  동작인식 이미지 추가와 동작인식을 할 수 있도록 코드 추가 - 최문형
 2021-05-17  10:23  도전과제 출력 시스템 병합 - 최문형
 2021-05-17  21:05  도전과제 출력 타이밍 개선 - 김창현
+2021-05-22  20:03  effect 소스코드 병합 - 김수영
 2021-05-22  09:24  게임 내 변수 시스템 추가 - 김창현
 2021-05-22  10:31  게임 내 변수 시스템 및 게임 종료 시 이펙트 병합 - 최문형
 '''
@@ -41,7 +42,69 @@ def start(Screen, partIndex, musicIndex = 1): # 자주 사용할 색깔 정의
 
     COLORS = [BLUE, GREEN, PINK]
 
+############################ effect 관련 - 김수영 ############################
+    # effect 관련(copyright : 김수영)
+    Effect_1_Left = pygame.image.load(
+    "Rhythm/effect/gin_tape_fan_man.png").convert_alpha()
+    Effect_1_Left = pygame.transform.scale(Effect_1_Left, (720, 720))
 
+    Effect_1_Right = pygame.image.load(
+    "Rhythm/effect/gin_tape_fan_woman.png").convert_alpha()
+    Effect_1_Right = pygame.transform.scale(Effect_1_Right, (720, 720))
+
+    Effect_2_Left = pygame.image.load(
+    "Rhythm/effect/Cheerleader1.png").convert_alpha()
+    Effect_2_Left = pygame.transform.scale(Effect_2_Left, (660, 580))
+
+    Effect_2_Right = pygame.image.load(
+    "Rhythm/effect/Cheerleader2.png").convert_alpha()
+    Effect_2_Right = pygame.transform.scale(Effect_2_Right, (660, 580))
+
+    Effect_3 = pygame.image.load("Rhythm/effect/Fancafe1.png").convert_alpha()
+    Effect_3 = pygame.transform.scale(Effect_3, (780, 560))
+
+    # 이미지 좌표(위치)
+    Effect_1_Level_1_Left_x = Screen_Width / 2 - 700
+    Effect_1_Level_1_Left_y = Screen_Height
+    Effect_1_Level_1_Right_x = Screen_Width / 2
+    Effect_1_Level_1_Right_y = Screen_Height
+
+    Effect_1_Level_2_Left_x = Screen_Width / 2 - 700
+    Effect_1_Level_2_Left_y = 50
+    Effect_1_Level_2_Right_x = Screen_Width / 2
+    Effect_1_Level_2_Right_y = 50
+
+    Effect_2_Level_1_Left_x = Screen_Width / 2 - 330 - 900
+    Effect_2_Level_1_Left_y = Screen_Height
+    Effect_2_Level_1_Right_x = Screen_Width / 2 - 330 + 900
+    Effect_2_Level_1_Right_y = Screen_Height
+
+    Effect_2_Level_2_Left_x = Screen_Width / 2 - 330 - 330
+    Effect_2_Level_2_Left_y = 300
+    Effect_2_Level_2_Right_x = Screen_Width / 2 - 330 + 330
+    Effect_2_Level_2_Right_y = 300
+
+    Effect_3_Level_1_x = Screen_Width
+    Effect_3_Level_1_y = 250
+
+    Effect_3_Level_2_x = Screen_Width / 2 - 140
+    Effect_3_Level_2_y = 250
+
+    Effect_1_Move_y = 0
+
+    Effect_2_Move_Right_x = 0
+    Effect_2_Move_Right_y = 0
+    Effect_2_Move_Left_x = 0
+    Effect_2_Move_Left_y = 0
+
+    Effect_3_Move_x = 0
+    Effect_3_Move_y = 3.5
+
+    Effect_Index = random.randrange(2, 5)
+############################################################################
+
+
+##################### 노드 이미지 불러오기 - 김창현, 최문형 #####################
     # 노드 이미지 불러오기
 
     standing = pygame.image.load('Rhythm/Upper_Pose/standing.png').convert_alpha()
@@ -314,8 +377,8 @@ def start(Screen, partIndex, musicIndex = 1): # 자주 사용할 색깔 정의
     Background_Middle = pygame.image.load("Rhythm/Screen/Smartphone.png").convert_alpha()
     Background_Middle = pygame.transform.scale(Background_Middle, (545, 808))
 
-    Background_Laft = pygame.image.load("Rhythm/Screen/SmartphoneLeftScreen.png").convert_alpha()
-    Background_Laft = pygame.transform.scale(Background_Laft, (405, 607))
+    Background_Left = pygame.image.load("Rhythm/Screen/SmartphoneLeftScreen.png").convert_alpha()
+    Background_Left = pygame.transform.scale(Background_Left, (405, 607))
 
     Background_Right = pygame.image.load("Rhythm/Screen/SmartphoneRightScreen.png").convert_alpha()
     Background_Right = pygame.transform.scale(Background_Right, (410, 607))
@@ -512,7 +575,7 @@ def start(Screen, partIndex, musicIndex = 1): # 자주 사용할 색깔 정의
             ShadowRect.set_alpha(30)
 
             Screen.blit(ShadowRect, (0, 102))
-            Screen.blit(Background_Laft, (0, 112))
+            Screen.blit(Background_Left, (0, 112))
             Screen.blit(Background_Right, (870, 112))
     ##############################################################################
 
@@ -546,7 +609,9 @@ def start(Screen, partIndex, musicIndex = 1): # 자주 사용할 색깔 정의
                 NodeOn = 0 
                 # 경과 시간(ms)을 1000으로 나누어서 초(s) 단위로 표시
                 Elapsed_Time = (pygame.time.get_ticks() - Start_Ticks) / 1000
-                if (Elapsed_Time > SongTime + 10):
+                if Elapsed_Time > SongTime and Elapsed_Time < SongTime + 10: # copyright : 김수영
+                    GameOn = Effect_Index
+                if (Elapsed_Time > SongTime + 11):
                     GameOn = 0
     ##############################################################################
 
@@ -611,6 +676,84 @@ def start(Screen, partIndex, musicIndex = 1): # 자주 사용할 색깔 정의
     ##############################################################################
 
 
+    ###################### 룰렛이 나오기 전, 이펙트 등장 - 김수영 ######################
+            elif GameOn == 2:
+                Screen.blit(WhiteScreen, (391, 68))
+                Screen.blit(Background_Middle, (363, 43))
+                Screen.blit(Effect_1_Left, (Effect_1_Level_1_Left_x, Effect_1_Level_1_Left_y))
+                Screen.blit(Effect_1_Right, (Effect_1_Level_1_Right_x, Effect_1_Level_1_Right_y))
+
+                if Elapsed_Time > SongTime + 1:
+                    Effect_1_Move_y -= 2.5
+                    if Effect_1_Level_1_Right_y > Effect_1_Level_2_Right_y and Effect_1_Level_1_Left_y > Effect_1_Level_2_Left_y:
+                        Effect_1_Level_1_Right_y += Effect_1_Move_y
+                        Effect_1_Level_1_Left_y += Effect_1_Move_y
+                if Elapsed_Time > SongTime + 2:
+                    Effect_1_Left = pygame.image.load("Rhythm/effect/gin_tape_fan_man_reflect.png").convert_alpha()
+                    Effect_1_Left = pygame.transform.scale(Effect_1_Left, (720, 720))
+                    Effect_1_Right = pygame.image.load("Rhythm/effect/gin_tape_fan_woman_reflect.png").convert_alpha()
+                    Effect_1_Right = pygame.transform.scale(Effect_1_Right, (720, 720))
+                if Elapsed_Time > SongTime + 3:
+                    Effect_1_Move_y -= 2.5
+                    Effect_1_Level_1_Right_y -= Effect_1_Move_y
+                    Effect_1_Level_1_Left_y -= Effect_1_Move_y
+
+            elif GameOn == 3:
+                Screen.blit(WhiteScreen, (391, 68))
+                Screen.blit(Background_Middle, (363, 43))
+                Screen.blit(Effect_2_Left, (Effect_2_Level_1_Left_x, Effect_2_Level_1_Left_y))
+                Screen.blit(Effect_2_Right, (Effect_2_Level_1_Right_x, Effect_2_Level_1_Right_y))
+
+                if Elapsed_Time > SongTime + 1:
+                    Effect_2_Move_Right_x -= 2.5
+                    Effect_2_Move_Right_y -= 2
+                    Effect_2_Move_Left_x += 2.5
+                    Effect_2_Move_Left_y -= 2
+                    if Effect_2_Level_1_Right_x > Effect_2_Level_2_Right_x and Effect_2_Level_1_Left_x < Effect_2_Level_2_Left_x and Effect_2_Level_1_Right_y > Effect_2_Level_2_Right_y and Effect_2_Level_1_Left_y > Effect_2_Level_2_Left_y:
+                        Effect_2_Level_1_Right_x += Effect_2_Move_Right_x
+                        Effect_2_Level_1_Right_y += Effect_2_Move_Right_y
+                        Effect_2_Level_1_Left_x += Effect_2_Move_Left_x
+                        Effect_2_Level_1_Left_y += Effect_2_Move_Left_y
+                if Elapsed_Time > SongTime + 3:
+                    Effect_2_Left = pygame.image.load("Rhythm/effect/Cheerleader2.png").convert_alpha()
+                    Effect_2_Right = pygame.image.load("Rhythm/effect/Cheerleader1.png").convert_alpha()
+                if Elapsed_Time > SongTime + 5:
+                    Effect_2_Left = pygame.image.load("Rhythm/effect/Cheerleader1.png").convert_alpha()
+                    Effect_2_Right = pygame.image.load("Rhythm/effect/Cheerleader2.png").convert_alpha()
+                    Effect_2_Move_Right_y = 0
+                    Effect_2_Move_Left_y = 0
+                if Elapsed_Time > SongTime + 7:
+                    Effect_2_Move_Right_y -= 2
+                    Effect_2_Move_Left_y -= 2
+                    Effect_2_Level_1_Right_x -= Effect_2_Move_Right_x
+                    Effect_2_Level_1_Right_y -= Effect_2_Move_Right_y
+                    Effect_2_Level_1_Left_x -= Effect_2_Move_Left_x
+                    Effect_2_Level_1_Left_y -= Effect_2_Move_Left_y
+
+            elif GameOn == 4:
+                Screen.blit(WhiteScreen, (391, 68))
+                Screen.blit(Background_Middle, (363, 43))
+                Screen.blit(Effect_3, (Effect_3_Level_1_x, Effect_3_Level_1_y))
+
+                if Elapsed_Time > SongTime + 1:
+                    Effect_3_Move_x += 3.5
+                    if Effect_3_Level_1_x > Effect_3_Level_2_x:
+                        Effect_3_Level_1_x -= Effect_3_Move_x
+                if Elapsed_Time > SongTime + 3:
+                    Effect_3_Level_1_y = Effect_3_Level_2_x / 2 - 90
+                    Effect_3_Level_1_x = Effect_3_Level_2_x / 2 + 200
+                    Effect_3 = pygame.image.load("Rhythm/effect/Fancafe2.png").convert_alpha()
+                    Effect_3 = pygame.transform.scale(Effect_3, (830, 595))
+                if Elapsed_Time > SongTime + 5:
+                    Effect_3_Level_1_y = Effect_3_Level_2_x / 2
+                    Effect_3_Level_1_x = Effect_3_Level_2_x / 2 + 220
+                    Effect_3 = pygame.image.load("Rhythm/effect/Fancafe1.png").convert_alpha()
+                if Elapsed_Time > SongTime + 7:
+                    Effect_3_Move_y -= 3.5
+                    Effect_3_Level_1_y -= Effect_3_Move_y
+    ##############################################################################
+
+
     ######################## 노래가 끝났을 경우 - 김창현 #############################
             elif GameOn == 0:  # 게임 온이 0이 되면
                 if PlayOn == 1:
@@ -618,29 +761,29 @@ def start(Screen, partIndex, musicIndex = 1): # 자주 사용할 색깔 정의
                     pygame.mixer.music.load("Rhythm/BGM/379240__westington__slot-machine.wav")
                     pygame.mixer.music.play(-1)
                     PlayOn -= 1
-                        
+
                 Screen.blit(WhiteScreen, (391, 68))
-                    # 밑에 코드가 다 룰렛
+                # 밑에 코드가 다 룰렛
                 if R_Count < 4:
                     if R_Count == 0:
                         if R_a < 50:
                             R_a += 1
-    
+
                     elif R_Count == 1:
                         if R_a < 100:
                             R_a += 1
-    
+
                     elif R_Count == 2:
                         if R_a > 50:
                             R_a -= 1
                     elif R_Count == 3:
                         if R_a > 25:
                             R_a -= 1
-    
+
                     if R_Count < 3:
                         if Index <= 6:
                             Screen.blit(list_Achievement[Index][0], (list_Achievement[Index][2], 100))
-    
+
                             if list_Achievement[Index][2] > 403 - list_Achievement[Index][1]:
                                 list_Achievement[Index][2] -= R_a
                             else:
@@ -652,9 +795,9 @@ def start(Screen, partIndex, musicIndex = 1): # 자주 사용할 색깔 정의
                     else:
                         if Index <= C_Index:
                             Screen.blit(list_Achievement[Index][0], (list_Achievement[Index][2], 100))
-    
+
                             if Index < C_Index:
-    
+
                                 if list_Achievement[Index][2] > 403 - list_Achievement[Index][1]:
                                     list_Achievement[Index][2] -= R_a
                                 else:
@@ -669,7 +812,7 @@ def start(Screen, partIndex, musicIndex = 1): # 자주 사용할 색깔 정의
                                         R_Count += 1
 
                 Screen.blit(list_Achievement[C_Index][0], (list_Achievement[C_Index][2], 100))
-                Screen.blit(Background_Laft, (0, 112))
+                Screen.blit(Background_Left, (0, 112))
                 Screen.blit(Background_Right, (870, 112))
                 Screen.blit(Background_Middle, (363, 43))
     #############################################################################
