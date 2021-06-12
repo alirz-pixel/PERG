@@ -7,9 +7,29 @@ copyright : 최문형
 
 import Pygame_Opening as Opening
 import MainMenu_Pose as MMP
+import tutorial as Tu
 from pygame.locals import *
 import pygame
 import sys
+
+def Func_FadeOut(Screen):
+    fade = pygame.Surface((Screen_Width, Screen_Height))
+    fade.fill((0, 0, 0))
+
+    alpha = 0
+    while True:
+        alpha += 3
+
+        fade.set_alpha(alpha)
+        Screen.blit(fade, (0, 0))
+
+        pygame.display.flip()
+        pygame.display.update()
+
+        pygame.time.Clock().tick(60)
+
+        if (alpha == 300):
+            break
 
 # 파이게임 시작하기
 pygame.init()
@@ -42,16 +62,25 @@ isButton = False
 ClickBGM = pygame.mixer.Sound("MenuScreen/sound/決定、ボタン押下39.mp3")
 
 
+# 텍스트 관련 변수
+text_Xpos = 0
+text_Count = 1
+textDelay = 3500
+
+textFont = pygame.font.Font("Rhythm/Font/CookieRun Bold.ttf", 23)
 
 
 #################################################
 py_clock = pygame.time.Clock()
+
 
 Opening.Func_Openning(Screen)
 pygame.mixer.music.load("MenuScreen/sound/In_Rejection.mp3")
 pygame.mixer.music.play(-1)
 Opening.Func_Title(Screen)
 pygame.mixer.music.stop()
+
+textTime = pygame.time.get_ticks()
 
 PlayOn = 0 # 배경음악이 켜져있는가 유무 
 running = True
@@ -68,6 +97,16 @@ while running:
         if event.type == pygame.MOUSEBUTTONDOWN:
             Click = True
             ClickBGM.play()
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_t:
+                Func_FadeOut(Screen)
+                Tu.Func_Tutorial(Screen)
+
+                textTime = pygame.time.get_ticks()
+                text_Xpos = 0
+                text_Count = 1
+                
 
         if event.type == pygame.QUIT:
             running = False
@@ -90,11 +129,18 @@ while running:
             # 상체, 하체, 전신 게임 시작
             if Click:
                 MMP.Func_Separation(Screen, i, Cursor)
-    
-                print(i)
+
 
     if not isButton:
         Screen.blit(Cursor[0], (Cursor_x, Cursor_y))
+
+    Screen.blit(textFont.render("튜토리얼을 해보시려면 T를 눌러주세요", True, (0, 0, 0)), (921 + text_Xpos, 45))
+
+
+    if pygame.time.get_ticks() >= textTime + textDelay:
+        if text_Xpos <= 360:
+            text_Xpos += (2 * text_Count)
+            text_Count += 1
 
 
     py_clock.tick(60)
