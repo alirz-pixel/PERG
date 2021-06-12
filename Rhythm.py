@@ -10,6 +10,7 @@
 2021-05-22  20:03  effect 소스코드 병합 - 김수영
 2021-05-22  09:24  게임 내 변수 시스템 추가 - 김창현
 2021-05-22  10:31  게임 내 변수 시스템 및 게임 종료 시 이펙트 병합 - 최문형
+2021-06-12  17:08  사용자가 스페셜 노드에 해당하는 운동동작을 취했을 시, 노드가 사라지는 코드 추가 - 최문형
 '''
 ################################### 모듈 ######################################
 import GetPose as GP
@@ -664,6 +665,28 @@ def start(Screen, partIndex, musicIndex = 1): # 자주 사용할 색깔 정의
 
                     except:
                         pass
+
+                    # 스페셜 노드 삭제하기
+                    if (len(queue_special_Node) != 0):
+                        try:
+                            if partIndex == 1:
+                                spBool_Same = Func_UpperSame(GetPose, queue_special_Node[0][-2], queue_special_Node[0][-1])
+                            elif partIndex == 2:
+                                spBool_Same = Func_DownSame(GetPose, queue_special_Node[0][-2], queue_special_Node[0][-1])
+                            elif partIndex == 3:
+                                spBool_Same = Func_FullSame(GetPose, queue_special_Node[0][-2], queue_special_Node[0][-1])
+
+                            if (spBool_Same):
+                                queue_special_Node.pop(0)
+                                Combo_FontSize = 60
+                                PlusScore += 1
+                                ComboNum += 1
+
+                                if NodeCount != 0:
+                                    Percentage = round(PlusScore / NodeCount * 100)  # 정확도
+
+                        except:
+                            pass
 
                 # 사용자의 캠을 스마트폰 화면 안에 넣기위해 인식받은 사용자의 캠의 크기를 원하는 크기만큼 자른다.
                 frame = frame[0:480, 153:486]
